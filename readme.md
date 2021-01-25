@@ -1,7 +1,7 @@
 # Личный проект «Типотека» [![Build status][travis-image]][travis-url]
 
 * Студент: [Юля Марта](https://up.htmlacademy.ru/nodejs/3/user/1237807).
-* Наставник: `Неизвестно`.
+* Наставник: [Алексей Пушников](https://htmlacademy.ru/profile/id476723).
 
 ---
 

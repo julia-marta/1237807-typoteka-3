@@ -1,6 +1,7 @@
 'use strict';
 
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
 
 const {
   ExitCode
@@ -95,27 +96,27 @@ const generatePosts = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+
+  async run(args) {
     const [count] = args;
 
     const countNumber = Number.parseInt(count, 10) || PostRestrict.MIN;
 
     if (countNumber > PostRestrict.MAX) {
-      console.error(`Не больше 1000 публикаций`);
+      console.error(chalk.red(`Не больше 1000 публикаций`));
       process.exit(ExitCode.success);
     }
 
     const countOffer = countNumber > PostRestrict.MIN ? countNumber : PostRestrict.MIN;
     const content = JSON.stringify(generatePosts(countOffer));
 
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        console.error(`Can't write data to file...`);
-        process.exit(ExitCode.error);
-      }
-
-      console.log(`Operation success. File created.`);
+    try {
+      await fs.writeFile(FILE_NAME, content);
+      console.log(chalk.green(`Operation success. File created.`));
       process.exit(ExitCode.success);
-    });
+    } catch (err) {
+      console.error(chalk.red(`Can't write data to file...`));
+      process.exit(ExitCode.error);
+    }
   }
 };

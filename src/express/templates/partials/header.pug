@@ -3,7 +3,7 @@ header.header
     img.logo__image(src="/img/icons/logo-image-only.svg", alt="логотип Тайпотеки")
     span.logo__name Типотека
 
-  if user.type === `guest`
+  if type === `guest`
     nav.header__nav
       ul.header__nav-list
         li.header__list-item
@@ -11,7 +11,7 @@ header.header
         li.header__list-item
           a.header__enter(href="/login") Вход с паролем
 
-  else if user.type === `admin`
+  else if type === `admin`
     button.button.button--colored.header__button-new Новая запись
     .header__dropdown
       a.button.button--burger.header__burger(href="#") Открыть меню

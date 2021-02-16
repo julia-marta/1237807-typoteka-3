@@ -2,15 +2,10 @@
 
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 
-const {
-  ExitCode
-} = require(`../../const`);
-
-const {
-  getRandomInt,
-  shuffleArray,
-} = require(`../../utils`);
+const {ExitCode, MAX_ID_LENGTH} = require(`../../const`);
+const {getRandomInt, shuffleArray} = require(`../../utils`);
 
 const FILE_NAME = `mocks.json`;
 const MAX_SENTENCES = 5;
@@ -19,10 +14,21 @@ const MONTH_PERIOD = 3;
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
+const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const PostRestrict = {
   MIN: 1,
   MAX: 1000,
+};
+
+const CommentsRestrict = {
+  MIN: 1,
+  MAX: 4,
+};
+
+const CommentLengthRestrict = {
+  MIN: 1,
+  MAX: 3,
 };
 
 const readContent = async (filePath) => {
@@ -48,13 +54,24 @@ const generateDate = () => {
   return createdDate;
 };
 
-const generatePosts = (count, titles, sentences, categories) => (
+const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
+    text: shuffleArray(comments)
+      .slice(0, getRandomInt(CommentLengthRestrict.MIN, CommentLengthRestrict.MAX))
+      .join(` `),
+  }))
+);
+
+const generatePosts = (count, titles, sentences, categories, comments) => (
+  Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffleArray(sentences).slice(0, getRandomInt(1, MAX_SENTENCES)).join(` `),
     fullText: shuffleArray(sentences).slice(0, getRandomInt(1, sentences.length - 1)).join(` `),
     createdDate: generateDate(),
     category: shuffleArray(categories).slice(0, getRandomInt(1, categories.length - 1)),
+    comments: generateComments(getRandomInt(CommentsRestrict.MIN, CommentsRestrict.MAX), comments),
   }))
 );
 
@@ -65,6 +82,7 @@ module.exports = {
     const titles = await readContent(FILE_TITLES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
+    const comments = await readContent(FILE_COMMENTS_PATH);
 
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || PostRestrict.MIN;
@@ -75,7 +93,7 @@ module.exports = {
     }
 
     const countOffer = countNumber > PostRestrict.MIN ? countNumber : PostRestrict.MIN;
-    const content = JSON.stringify(generatePosts(countOffer, titles, sentences, categories));
+    const content = JSON.stringify(generatePosts(countOffer, titles, sentences, categories, comments));
 
     try {
       await fs.writeFile(FILE_NAME, content);

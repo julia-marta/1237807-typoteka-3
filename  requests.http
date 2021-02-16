@@ -1,0 +1,96 @@
+# Список всех публикаций
+GET http://localhost:3000/api/articles HTTP/1.1
+
+###
+
+# Полная информация о публикации
+GET http://localhost:3000/api/articles/wKoSRa HTTP/1.1
+
+###
+
+# Список категорий
+GET http://localhost:3000/api/categories HTTP/1.1
+
+###
+
+# Создание публикации
+POST http://localhost:3000/api/articles HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Заголовок новой публикации",
+  "announce": "Это анонс новой публикации",
+  "fullText": "Полный текст новой публикации",
+  "createdDate": "2021-01-02T10:25:17.897Z",
+  "category": ["Программирование", "Путешествия"]
+}
+
+###
+
+# Создание публикации с лишним полем
+POST http://localhost:3000/api/articles HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Заголовок новой публикации",
+  "announce": "Это анонс новой публикации",
+  "fullText": "Полный текст новой публикации",
+  "createdDate": "2021-01-02T10:25:17.897Z",
+  "category": ["Программирование", "Путешествия"],
+  "comments": "test test test"
+}
+
+###
+
+# Редактирование публикации
+PUT http://localhost:3000/api/articles/wKoSRa HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Отредактированный заголовок",
+  "announce": "Отредактированный анонс",
+  "fullText": "Отредактированный полный текст",
+  "createdDate": "2021-01-02T10:25:17.897Z",
+  "category": ["Велоспорт"]
+}
+
+###
+
+# Удаление публикации
+DELETE http://localhost:3000/api/articles/R9HrEZ HTTP/1.1
+
+###
+
+# Список комментариев публикации
+GET http://localhost:3000/api/articles/wKoSRa/comments HTTP/1.1
+
+###
+
+# Удаление комментария
+DELETE http://localhost:3000/api/articles/wKoSRa/comments/F_qdYm HTTP/1.1
+
+###
+
+# Добавление нового комментария
+POST http://localhost:3000/api/articles/wKoSRa/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "text": "Это новый комментарий"
+}
+
+###
+
+# Добавление нового комментария с лишним полем
+POST http://localhost:3000/api/articles/wKoSRa/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "text": "Это новый комментарий",
+  "id": "test"
+}
+
+###
+
+# Поиск публикаций
+GET http://localhost:3000/api/search?query=камни HTTP/1.1

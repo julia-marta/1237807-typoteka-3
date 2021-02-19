@@ -5,47 +5,55 @@ const {HttpCode} = require(`../../const`);
 const articleExists = require(`../middlewares/article-exists`);
 const articleValidator = require(`../middlewares/article-validator`);
 
-const route = new Router();
+module.exports = (serviceLocator) => {
+  const route = new Router();
 
-module.exports = (app, articleService, commentsRouter) => {
+  const app = serviceLocator.get(`app`);
+  const service = serviceLocator.get(`articleService`);
+  const logger = serviceLocator.get(`logger`);
+
+  const isPostExists = articleExists(service, logger);
+  const isPostValid = articleValidator(logger);
+
   app.use(`/articles`, route);
 
   route.get(`/`, (req, res) => {
-    const posts = articleService.findAll();
+    const posts = service.findAll();
 
     return res.status(HttpCode.OK).json(posts);
   });
 
-  route.get(`/:articleId`, articleExists(articleService), (req, res) => {
+  route.get(`/:articleId`, isPostExists, (req, res) => {
     const {post} = res.locals;
 
     return res.status(HttpCode.OK).json(post);
   });
 
-  route.post(`/`, articleValidator, (req, res) => {
-    const post = articleService.add(req.body);
+  route.post(`/`, isPostValid, (req, res) => {
+    const post = service.add(req.body);
 
     return res.status(HttpCode.CREATED).json(post);
   });
 
-  route.put(`/:articleId`, [articleExists(articleService), articleValidator], (req, res) => {
+  route.put(`/:articleId`, [isPostExists, isPostValid], (req, res) => {
     const {articleId} = req.params;
 
-    const updatedPost = articleService.update(articleId, req.body);
+    const updatedPost = service.update(articleId, req.body);
 
     return res.status(HttpCode.OK).json(updatedPost);
   });
 
   route.delete(`/:articleId`, (req, res) => {
     const {articleId} = req.params;
-    const deletedPost = articleService.delete(articleId);
+    const deletedPost = service.delete(articleId);
 
     if (!deletedPost) {
-      return res.status(HttpCode.NOT_FOUND).send(`Post with ${articleId} not found`);
+      res.status(HttpCode.NOT_FOUND).send(`Post with ${articleId} not found`);
+      return logger.error(`Post not found: ${articleId}`);
     }
 
     return res.status(HttpCode.OK).json(deletedPost);
   });
 
-  route.use(`/:articleId/comments`, articleExists(articleService), commentsRouter);
+  return route;
 };

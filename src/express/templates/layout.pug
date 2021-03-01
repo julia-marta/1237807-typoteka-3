@@ -11,11 +11,11 @@ html(lang="ru")
     link(rel="preload", href="/fonts/SFProDisplay-Regular.woff2", as="font", crossorigin="anonymous")
     link(rel="stylesheet", href="/css/style.min.css")
   body
+    mixin date(dateTime)
+      time(class!=attributes.class || `preview__time`, datetime=dateTime) #{new Date(dateTime).toLocaleDateString(_, {hour: 'numeric', minute: 'numeric'})}
     div(class=`${wrapper || `wrapper`}`)
       include partials/header.pug
       block content
       include partials/footer.pug
     script(src="/js/vendor.js")
     script(src="/js/main.js")
-
-

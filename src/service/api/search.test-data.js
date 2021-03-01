@@ -15,6 +15,7 @@ module.exports.mockData = [
       `Велоспорт`,
       `Железо`
     ],
+    image: `skyscraper@1x.jpg`,
     comments: [
       {
         id: `DABd9S`,
@@ -38,6 +39,7 @@ module.exports.mockData = [
       `Разное`,
       `Железо`
     ],
+    image: `skyscraper@1x.jpg`,
     comments: [
       {
         id: `UteIOa`,
@@ -69,6 +71,7 @@ module.exports.mockData = [
       `Музыка`,
       `Программирование`
     ],
+    image: `skyscraper@1x.jpg`,
     comments: [
       {
         id: `jptnWS`,

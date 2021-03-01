@@ -46,8 +46,5 @@ module.exports.PageStyle = {
   },
   "/articles/add": {
     type: `admin`
-  },
-  "/articles/edit/:id": {
-    type: `admin`
   }
 };

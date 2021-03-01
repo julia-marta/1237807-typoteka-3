@@ -9,11 +9,13 @@ const {getRandomInt, shuffleArray} = require(`../../utils`);
 
 const FILE_NAME = `mocks.json`;
 const MAX_SENTENCES = 5;
+const MAX_CATEGORIES = 3;
 const MONTH_PERIOD = 3;
 
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
+const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const PostRestrict = {
@@ -63,14 +65,15 @@ const generateComments = (count, comments) => (
   }))
 );
 
-const generatePosts = (count, titles, sentences, categories, comments) => (
+const generatePosts = (count, titles, sentences, categories, images, comments) => (
   Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffleArray(sentences).slice(0, getRandomInt(1, MAX_SENTENCES)).join(` `),
     fullText: shuffleArray(sentences).slice(0, getRandomInt(1, sentences.length - 1)).join(` `),
     createdDate: generateDate(),
-    category: shuffleArray(categories).slice(0, getRandomInt(1, categories.length - 1)),
+    category: shuffleArray(categories).slice(0, getRandomInt(1, MAX_CATEGORIES)),
+    image: images[getRandomInt(0, images.length - 1)],
     comments: generateComments(getRandomInt(CommentsRestrict.MIN, CommentsRestrict.MAX), comments),
   }))
 );
@@ -82,6 +85,7 @@ module.exports = {
     const titles = await readContent(FILE_TITLES_PATH);
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
+    const images = await readContent(FILE_IMAGES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
 
     const [count] = args;
@@ -93,7 +97,7 @@ module.exports = {
     }
 
     const countOffer = countNumber > PostRestrict.MIN ? countNumber : PostRestrict.MIN;
-    const content = JSON.stringify(generatePosts(countOffer, titles, sentences, categories, comments));
+    const content = JSON.stringify(generatePosts(countOffer, titles, sentences, categories, images, comments));
 
     try {
       await fs.writeFile(FILE_NAME, content);

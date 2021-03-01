@@ -3,10 +3,22 @@ extends layout.pug
 block content
   main
     section.search-page
-      .search-page__wrapper
+      .search-page__wrapper(class=(results && results.length === 0 ? `search-page__wrapper--empty` : ``))
         h1 Поиск
         .search.search-page__form
-          form(action="#", method="get")
+          form(action="/search", method="get")
             label
-              input(type="text", name="search", placeholder="Что ищем?")
+              input(type="text", name="search", placeholder="Что ищем?" value=(search || ``))
             button.search__button.button.button--transparent(type="submit") Найти
+
+          if results && results.length > 0
+            each article in results
+              .search__result
+                +date(article.createdDate)(class=`search__date`)
+                a.search__link(href=`/articles/${article.id}`)
+                  | #{article.title.split(search)[0]}
+                  b #{search}
+                  | #{article.title.split(search)[1]}
+
+        if results && results.length === 0
+          p.search-page__empty Ничего не нашлось

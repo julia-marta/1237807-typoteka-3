@@ -9,9 +9,13 @@ const api = apiFactory.getAPI();
 
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles/articles-by-category`));
 
-articlesRouter.get(`/add`, async (req, res) => {
-  const categories = await api.getCategories();
-  res.render(`articles/new-post`, {categories});
+articlesRouter.get(`/add`, async (req, res, next) => {
+  try {
+    const categories = await api.getCategories();
+    res.render(`articles/new-post`, {categories});
+  } catch (err) {
+    next(err);
+  }
 });
 
 articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
@@ -42,9 +46,7 @@ articlesRouter.get(`/edit/:id`, async (req, res, next) => {
     const [article, categories] = await Promise.all([
       api.getArticle(id),
       api.getCategories()
-    ]).catch((error) => {
-      throw error;
-    });
+    ]);
 
     res.render(`articles/new-post`, {article, categories});
   } catch (err) {
@@ -59,9 +61,7 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
     const [article, articles] = await Promise.all([
       api.getArticle(id),
       api.getArticles()
-    ]).catch((error) => {
-      throw error;
-    });
+    ]);
 
     res.render(`articles/post`, {article, articles});
   } catch (err) {

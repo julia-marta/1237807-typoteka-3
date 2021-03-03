@@ -44,6 +44,7 @@ module.exports.mockData = [
     category: [
       `За жизнь`
     ],
+    image: `sea@1x.jpg`,
     comments: [
       {
         id: `uEP7Ug`,
@@ -67,6 +68,7 @@ module.exports.mockData = [
       `Велоспорт`,
       `За жизнь`
     ],
+    image: `sea@1x.jpg`,
     comments: [
       {
         id: `LEKS_c`,
@@ -100,6 +102,7 @@ module.exports.mockData = [
       `Велоспорт`,
       `Железо`
     ],
+    image: `sea@1x.jpg`,
     comments: [
       {
         id: `J3INqD`,
@@ -125,5 +128,6 @@ module.exports.mockPost = {
   category: [
     `Котики`,
     `Железо`
-  ]
+  ],
+  image: `cat.jpg`
 };

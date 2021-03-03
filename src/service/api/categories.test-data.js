@@ -11,6 +11,7 @@ module.exports.mockData = [
       `Кино`,
       `Железо`
     ],
+    image: `forest@1x.jpg`,
     comments: [
       {
         id: `6Kb3In`,
@@ -33,6 +34,7 @@ module.exports.mockData = [
       `Без рамки`,
       `IT`
     ],
+    image: `forest@1x.jpg`,
     comments: [
       {
         id: `ks8VaF`,
@@ -50,6 +52,7 @@ module.exports.mockData = [
       `Программирование`,
       `Путешествия`
     ],
+    image: `forest@1x.jpg`,
     comments: [
       {
         id: `_fV3JX`,

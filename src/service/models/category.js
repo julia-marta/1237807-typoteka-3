@@ -1,10 +1,11 @@
 "use strict";
 
 const {DataTypes, Model} = require(`sequelize`);
+const Aliase = require(`./aliase`);
 
 class Category extends Model {}
 
-const define = (sequelize) => Category.init({
+const defineCategory = (sequelize) => Category.init({
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -15,4 +16,10 @@ const define = (sequelize) => Category.init({
   tableName: `categories`
 });
 
-module.exports = define;
+const defineCategoryRelations = (Article, ArticleCategory) => {
+
+  Category.belongsToMany(Article, {through: ArticleCategory, as: Aliase.ARTICLES});
+  Category.hasMany(ArticleCategory, {as: Aliase.ARTICLE_CATEGORIES});
+};
+
+module.exports = {defineCategory, defineCategoryRelations};

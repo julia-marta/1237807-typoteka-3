@@ -2,9 +2,11 @@
 
 const {HttpCode} = require(`../../const`);
 
-module.exports = (service, logger) => (req, res, next) => {
+module.exports = (service, logger) => async (req, res, next) => {
   const {articleId} = req.params;
-  const post = service.findOne(articleId);
+  const {comments = false} = req.query;
+
+  const post = await service.findOne(articleId, comments);
 
   if (!post) {
     res.status(HttpCode.NOT_FOUND).send(`Post with ${articleId} not found`);

@@ -10,7 +10,7 @@ mainRouter.get(`/`, async (req, res, next) => {
   try {
     const [articles, categories] = await Promise.all([
       api.getArticles(),
-      api.getCategories()
+      api.getCategories({count: true})
     ]);
 
     res.render(`main`, {articles, categories});

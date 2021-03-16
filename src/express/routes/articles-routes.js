@@ -27,7 +27,7 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
     announce: body.announcement,
     fullText: body[`full-text`],
     createdDate: body.date,
-    category: body.category,
+    categories: body.category,
     image: file.filename,
   };
 
@@ -58,12 +58,12 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
   const {id} = req.params;
 
   try {
-    const [article, articles] = await Promise.all([
-      api.getArticle(id),
-      api.getArticles()
+    const [article, categories] = await Promise.all([
+      api.getArticle(id, {comments: true}),
+      api.getCategories({count: true})
     ]);
 
-    res.render(`articles/post`, {article, articles});
+    res.render(`articles/post`, {article, categories});
   } catch (err) {
     next(err);
   }

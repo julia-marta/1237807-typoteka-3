@@ -17,8 +17,10 @@ module.exports = (serviceLocator) => {
 
   app.use(`/articles`, route);
 
-  route.get(`/`, (req, res) => {
-    const posts = service.findAll();
+  route.get(`/`, async (req, res) => {
+    const {comments = false} = req.query;
+
+    const posts = await service.findAll(comments);
 
     return res.status(HttpCode.OK).json(posts);
   });
@@ -29,30 +31,31 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(post);
   });
 
-  route.post(`/`, isPostValid, (req, res) => {
-    const post = service.add(req.body);
+  route.post(`/`, isPostValid, async (req, res) => {
+    const post = await service.add(req.body);
 
     return res.status(HttpCode.CREATED).json(post);
   });
 
-  route.put(`/:articleId`, [isPostExists, isPostValid], (req, res) => {
+  route.put(`/:articleId`, [isPostExists, isPostValid], async (req, res) => {
     const {articleId} = req.params;
 
-    const updatedPost = service.update(articleId, req.body);
+    await service.update(articleId, req.body);
 
-    return res.status(HttpCode.OK).json(updatedPost);
+    return res.status(HttpCode.OK).send(`Offer was updated`);
   });
 
-  route.delete(`/:articleId`, (req, res) => {
+  route.delete(`/:articleId`, async (req, res) => {
     const {articleId} = req.params;
-    const deletedPost = service.delete(articleId);
 
-    if (!deletedPost) {
+    const deleted = await service.delete(articleId);
+
+    if (!deleted) {
       res.status(HttpCode.NOT_FOUND).send(`Post with ${articleId} not found`);
       return logger.error(`Post not found: ${articleId}`);
     }
 
-    return res.status(HttpCode.OK).json(deletedPost);
+    return res.status(HttpCode.OK).send(`Offer was deleted`);
   });
 
   return route;

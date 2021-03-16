@@ -1,29 +1,19 @@
 "use strict";
 
-const {Model} = require(`sequelize`);
-const defineCategory = require(`./category`);
-const defineComment = require(`./comment`);
-const defineArticle = require(`./article`);
-const Aliase = require(`./aliase`);
-
-class ArticleCategory extends Model {}
+const {defineCategory, defineCategoryRelations} = require(`./category`);
+const {defineComment, defineCommentRelations} = require(`./comment`);
+const {defineArticle, defineArticleRelations} = require(`./article`);
+const defineArticleCategory = require(`./article-category`);
 
 const define = (sequelize) => {
   const Category = defineCategory(sequelize);
   const Comment = defineComment(sequelize);
   const Article = defineArticle(sequelize);
-  ArticleCategory.init({}, {
-    sequelize,
-    modelName: `ArticleCategory`,
-    tableName: `article-categories`
-  });
+  const ArticleCategory = defineArticleCategory(sequelize);
 
-  Article.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `articleId`});
-  Comment.belongsTo(Article, {foreignKey: `articleId`});
-
-  Article.belongsToMany(Category, {through: ArticleCategory, as: Aliase.CATEGORIES});
-  Category.belongsToMany(Article, {through: ArticleCategory, as: Aliase.ARTICLES});
-  Category.hasMany(ArticleCategory, {as: Aliase.ARTICLE_CATEGORIES});
+  defineArticleRelations(Comment, Category, ArticleCategory);
+  defineCommentRelations(Article);
+  defineCategoryRelations(Article, ArticleCategory);
 
   return {Category, Comment, Article, ArticleCategory};
 };

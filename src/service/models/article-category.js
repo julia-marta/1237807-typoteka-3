@@ -10,4 +10,4 @@ const define = (sequelize) => ArticleCategory.init({}, {
   tableName: `article_categories`
 });
 
-module.exports = define;
+module.exports = {define};

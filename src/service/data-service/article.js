@@ -45,7 +45,7 @@ class ArticleService {
   }
 
   async update(id, articleData) {
-    const [affectedRows] = await this._Offer.update(articleData, {
+    const [affectedRows] = await this._Article.update(articleData, {
       where: {id}
     });
     return !!affectedRows;

@@ -1,19 +1,19 @@
 "use strict";
 
-const {defineCategory, defineCategoryRelations} = require(`./category`);
-const {defineComment, defineCommentRelations} = require(`./comment`);
-const {defineArticle, defineArticleRelations} = require(`./article`);
-const defineArticleCategory = require(`./article-category`);
+const CategoryModel = require(`./category`);
+const CommentModel = require(`./comment`);
+const ArticleModel = require(`./article`);
+const ArticleCategoryModel = require(`./article-category`);
 
 const define = (sequelize) => {
-  const Category = defineCategory(sequelize);
-  const Comment = defineComment(sequelize);
-  const Article = defineArticle(sequelize);
-  const ArticleCategory = defineArticleCategory(sequelize);
+  const Category = CategoryModel.define(sequelize);
+  const Comment = CommentModel.define(sequelize);
+  const Article = ArticleModel.define(sequelize);
+  const ArticleCategory = ArticleCategoryModel.define(sequelize);
 
-  defineArticleRelations(Comment, Category, ArticleCategory);
-  defineCommentRelations(Article);
-  defineCategoryRelations(Article, ArticleCategory);
+  [CategoryModel, CommentModel, ArticleModel].forEach(
+      (model) => model.defineRelations({Comment, Category, Article, ArticleCategory})
+  );
 
   return {Category, Comment, Article, ArticleCategory};
 };

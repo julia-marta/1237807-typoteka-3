@@ -28,7 +28,7 @@ module.exports = (serviceLocator) => {
   route.delete(`/:commentId`, isPostExists, async (req, res) => {
     const {commentId} = req.params;
 
-    const deleted = await commentService.drop(commentId);
+    const deleted = await commentService.delete(commentId);
 
     if (!deleted) {
       res.status(HttpCode.NOT_FOUND).send(`Comment with ${commentId} not found`);

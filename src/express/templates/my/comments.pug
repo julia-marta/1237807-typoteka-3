@@ -11,7 +11,7 @@ block content
               .publication__header
                 img.publication__list-image(src="/img/avatar-small-2.png", width="20", height="20", alt="Аватар пользователя")
                 b.publication__list-name Александр Петров
-                time.publication__item-time(datetime="2019-03-21T20:33") 21.03.2019, 20:33
+                +date(comment.createdAt)(class=`publication__item-time`)
               a.publication__item-text(href="#") #{comment.text}
               p.publication__text-strong #{article.title}
               button.publication__button.button.button--close-item(type="button")

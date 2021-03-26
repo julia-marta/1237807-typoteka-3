@@ -15,18 +15,13 @@ class CategoryService {
         `id`,
         `name`,
         [
-          Sequelize.fn(
-              `COUNT`,
-              `*`
-          ),
-          `count`
-        ]
+          Sequelize.fn(`COUNT`, Sequelize.col(`articleCategories.CategoryId`)), `count`]
       ],
       group: [Sequelize.col(`Category.id`)],
       include: [{
         model: this._ArticleCategory,
         as: Aliase.ARTICLE_CATEGORIES,
-        attributes: []
+        attributes: [],
       }]
     });
 

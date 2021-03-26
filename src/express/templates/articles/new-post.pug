@@ -34,10 +34,10 @@ block content
 
                 .new-publication__category-wrapper
 
-                  each category, index in categories
-                    .new-publication__checkbox(class=`new-publication__checkbox--${index + 1}`)
-                      input(id=`checkbox-${index + 1}`, type="checkbox", name="category", value=category checked=(article ? article.category.includes(category) : false))
-                      label(for=`checkbox-${index + 1}`) #{category}
+                  each category in categories
+                    .new-publication__checkbox(class=`new-publication__checkbox--${category.id}`)
+                      input(id=`checkbox-${category.id}`, type="checkbox", name="category", value=category.id checked=(article ? article.categories.some(item => item.id === category.id) : false))
+                      label(for=`checkbox-${category.id}`) #{category.name}
 
                   a.new-publication__form-link.button.button--transparent(href="/categories") Добавить категорию
               .form__wrapper.form__wrapper--text

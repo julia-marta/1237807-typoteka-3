@@ -7,7 +7,7 @@ const comments = require(`../api/comments`);
 const search = require(`../api/search`);
 const serviceLocatorFactory = require(`../lib/service-locator`);
 const sequelize = require(`../lib/sequelize`);
-// const defineModels = require(`../models`);
+const defineModels = require(`../models`);
 
 const {CategoryService, ArticleService, CommentService, SearchService} = require(`../data-service`);
 
@@ -15,7 +15,7 @@ module.exports = async (logger) => {
   const app = new Router();
   const serviceLocator = serviceLocatorFactory();
 
-  // defineModels(sequelize);
+  defineModels(sequelize);
 
   serviceLocator.register(`app`, app);
   serviceLocator.register(`logger`, logger);

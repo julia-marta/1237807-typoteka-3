@@ -5,7 +5,7 @@ const Aliase = require(`./aliase`);
 
 class Article extends Model {}
 
-const defineArticle = (sequelize) => Article.init({
+const define = (sequelize) => Article.init({
   title: {
     type: DataTypes.STRING,
     allowNull: false
@@ -26,10 +26,10 @@ const defineArticle = (sequelize) => Article.init({
   tableName: `articles`
 });
 
-const defineArticleRelations = (Comment, Category, ArticleCategory) => {
+const defineRelations = ({Comment, Category, ArticleCategory}) => {
 
   Article.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `articleId`});
   Article.belongsToMany(Category, {through: ArticleCategory, as: Aliase.CATEGORIES});
 };
 
-module.exports = {defineArticle, defineArticleRelations};
+module.exports = {define, defineRelations};

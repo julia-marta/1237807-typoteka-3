@@ -42,7 +42,7 @@ module.exports = (serviceLocator) => {
 
     await service.update(articleId, req.body);
 
-    return res.status(HttpCode.OK).send(`Offer was updated`);
+    return res.status(HttpCode.OK).send(`Post was updated`);
   });
 
   route.delete(`/:articleId`, async (req, res) => {
@@ -55,7 +55,7 @@ module.exports = (serviceLocator) => {
       return logger.error(`Post not found: ${articleId}`);
     }
 
-    return res.status(HttpCode.OK).send(`Offer was deleted`);
+    return res.status(HttpCode.OK).send(`Post was deleted`);
   });
 
   return route;

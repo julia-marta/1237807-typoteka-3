@@ -3,8 +3,8 @@ mixin themes(categories)
     each category in categories
       li.themes__item
         a.themes__item-link(href="#")
-          | #{category}
-          sup #{articles.filter((article) => article.category.includes(category)).length}
+          | #{category.name} 
+          sup #{category.count}
 
         if attributes.class
           button.themes__remove-btn(type="button") Удалить категорию

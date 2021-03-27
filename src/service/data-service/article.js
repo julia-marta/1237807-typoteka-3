@@ -1,43 +1,54 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../const`);
+const Aliase = require(`../models/aliase`);
 
 class ArticleService {
-  constructor(posts) {
-    this._posts = posts;
+  constructor(sequelize) {
+    this._Article = sequelize.models.Article;
+    this._Comment = sequelize.models.Comment;
+    this._Category = sequelize.models.Category;
   }
 
-  add(post) {
-    const newPost = Object.assign({id: nanoid(MAX_ID_LENGTH), comments: []}, post);
-
-    this._posts.push(newPost);
-    return newPost;
+  async add(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.categories);
+    return article.get();
   }
 
-  delete(id) {
-    const deletedPost = this._posts.find((item) => item.id === id);
+  async delete(id) {
+    const deletedRows = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
+  }
 
-    if (!deletedPost) {
-      return null;
+  async findAll(withComments) {
+    const include = [Aliase.CATEGORIES];
+
+    if (withComments) {
+      include.push(Aliase.COMMENTS);
     }
 
-    this._posts = this._posts.filter((item) => item.id !== id);
-    return deletedPost;
+    const articles = await this._Article.findAll({include});
+
+    return articles.map((article) => article.get());
   }
 
-  findAll() {
-    return this._posts;
+  async findOne(id, withComments) {
+    const include = [Aliase.CATEGORIES];
+
+    if (withComments) {
+      include.push(Aliase.COMMENTS);
+    }
+
+    return this._Article.findByPk(id, {include});
   }
 
-  findOne(id) {
-    return this._posts.find((item) => item.id === id);
-  }
-
-  update(id, newPost) {
-    const oldPost = this._posts.find((item) => item.id === id);
-
-    return Object.assign(oldPost, newPost);
+  async update(id, articleData) {
+    const [affectedRows] = await this._Article.update(articleData, {
+      where: {id}
+    });
+    return !!affectedRows;
   }
 }
 

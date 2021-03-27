@@ -9,8 +9,8 @@ const api = apiFactory.getAPI();
 mainRouter.get(`/`, async (req, res, next) => {
   try {
     const [articles, categories] = await Promise.all([
-      api.getArticles(),
-      api.getCategories()
+      api.getArticles({comments: true}),
+      api.getCategories({count: true})
     ]);
 
     res.render(`main`, {articles, categories});

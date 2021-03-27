@@ -26,9 +26,8 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
     title: body.title,
     announce: body.announcement,
     fullText: body[`full-text`],
-    createdDate: body.date,
-    category: body.category,
-    image: file.filename,
+    categories: body.category,
+    image: file ? file.filename : body.photo || ``
   };
 
   try {
@@ -58,12 +57,16 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
   const {id} = req.params;
 
   try {
-    const [article, articles] = await Promise.all([
-      api.getArticle(id),
-      api.getArticles()
+    const [article, allCategories] = await Promise.all([
+      api.getArticle(id, {comments: true}),
+      api.getCategories({count: true})
     ]);
 
-    res.render(`articles/post`, {article, articles});
+    const categories = allCategories.filter((category) => {
+      return article.categories.some((item) => item.id === category.id);
+    });
+
+    res.render(`articles/post`, {article, categories});
   } catch (err) {
     next(err);
   }

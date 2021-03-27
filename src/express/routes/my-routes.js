@@ -17,7 +17,7 @@ myRouter.get(`/`, async (req, res, next) => {
 
 myRouter.get(`/comments`, async (req, res, next) => {
   try {
-    const articles = await api.getArticles();
+    const articles = await api.getArticles({comments: true});
     res.render(`my/comments`, {articles: articles.slice(0, 3)});
   } catch (err) {
     next(err);

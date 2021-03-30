@@ -18,11 +18,16 @@ module.exports = (serviceLocator) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const {comments = false} = req.query;
+    const {offset, limit, comments = false} = req.query;
+    let result;
 
-    const posts = await service.findAll(comments);
+    if (limit || offset) {
+      result = await service.findPage({limit, offset, comments});
+    } else {
+      result = await service.findAll(comments);
+    }
 
-    return res.status(HttpCode.OK).json(posts);
+    return res.status(HttpCode.OK).json(result);
   });
 
   route.get(`/:articleId`, isPostExists, (req, res) => {

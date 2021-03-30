@@ -3,17 +3,31 @@
 const {Router} = require(`express`);
 const apiFactory = require(`../api`);
 const mainRouter = new Router();
+const {getPagerRange} = require(`../../utils`);
+
+const ARTICLES_PER_PAGE = 8;
+const PAGER_WIDTH = 2;
 
 const api = apiFactory.getAPI();
 
 mainRouter.get(`/`, async (req, res, next) => {
+
+  let {page = 1} = req.query;
+  page = +page;
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
   try {
-    const [articles, categories] = await Promise.all([
-      api.getArticles({comments: true}),
+    const [{count, articles}, categories] = await Promise.all([
+      api.getArticles({limit, offset, comments: true}),
       api.getCategories({count: true})
     ]);
 
-    res.render(`main`, {articles, categories});
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+    const range = getPagerRange(page, totalPages, PAGER_WIDTH);
+    const withPagination = totalPages > 1;
+
+    res.render(`main`, {articles, categories, page, totalPages, range, withPagination});
   } catch (err) {
     next(err);
   }

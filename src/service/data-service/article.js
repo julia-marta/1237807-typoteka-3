@@ -44,6 +44,23 @@ class ArticleService {
     return this._Article.findByPk(id, {include});
   }
 
+  async findPage({limit, offset, comments}) {
+    const tables = [Aliase.CATEGORIES];
+
+    if (comments) {
+      tables.push(Aliase.COMMENTS);
+    }
+
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include: tables,
+      distinct: true
+    });
+
+    return {count, articles: rows};
+  }
+
   async update(id, articleData) {
     const [affectedRows] = await this._Article.update(articleData, {
       where: {id}

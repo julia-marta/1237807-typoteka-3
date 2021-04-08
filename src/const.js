@@ -17,9 +17,52 @@ module.exports.HttpCode = {
   BAD_REQUEST: 400,
 };
 
-module.exports.API_PREFIX = `/api`;
+module.exports.Title = {
+  MIN_LENGTH: 30,
+  MAX_LENGTH: 250,
+};
 
-module.exports.MAX_ID_LENGTH = 6;
+module.exports.Announce = {
+  MIN_LENGTH: 30,
+  MAX_LENGTH: 250,
+};
+
+
+module.exports.Comment = {
+  MIN_LENGTH: 20,
+  MAX_LENGTH: 1000,
+};
+
+module.exports.MAX_TEXT_LENGTH = 1000;
+
+module.exports.MIN_CATEGORIES_LENGTH = 1;
+
+module.exports.ArticleMessage = {
+
+  REQUIRED: {
+    TITLE: `Укажите название статьи`,
+    ANNOUNCE: `Заполните описание статьи`,
+    CATEGORIES: `Выберите хотя бы одну категорию`,
+    DATE: `Выберите дату`,
+  },
+  VALID: {
+    CATEGORIES: `Выбрана несуществующая категория`,
+    DATE: `Неверный формат даты`
+  },
+  MIN_TITLE_LENGTH: `Заголовок должен быть не меньше 30 символов`,
+  MAX_TITLE_LENGTH: `Заголовок должен быть не больше 250 символов`,
+  MIN_ANNOUNCE_LENGTH: `Описание должно быть не меньше 30 символов`,
+  MAX_ANNOUNCE_LENGTH: `Описание должно быть не больше 250 символов`,
+  MAX_FULL_TEXT_LENGTH: `Текст статьи не можеты быть больше 1000 символов`,
+};
+
+module.exports.CommentMessage = {
+  REQUIRED: `Сообщение не может быть пустым, напишите что-нибудь!`,
+  MIN_TEXT_LENGTH: `Текст комментария должен быть не меньше 20 символов`,
+  MAX_TEXT_LENGTH: `Текст объявления должен быть не больше 1000 символов`,
+};
+
+module.exports.API_PREFIX = `/api`;
 
 const WrapperType = {
   COLOR: `wrapper-color`,

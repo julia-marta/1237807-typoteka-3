@@ -5,11 +5,12 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 const initDB = require(`../lib/init-db`);
 const articles = require(`./articles`);
-const DataService = require(`../data-service/article`);
+const ArticleService = require(`../data-service/article`);
+const CategoryService = require(`../data-service/category`);
 const serviceLocatorFactory = require(`../lib/service-locator`);
 const {getLogger} = require(`../lib/test-logger`);
 const {mockArticles, mockCategories, mockPost} = require(`./articles.test-data`);
-const {HttpCode} = require(`../../const`);
+const {HttpCode, ArticleMessage} = require(`../../const`);
 
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
@@ -21,7 +22,8 @@ const createAPI = async () => {
 
   serviceLocator.register(`app`, app);
   serviceLocator.register(`logger`, logger);
-  serviceLocator.register(`articleService`, new DataService(mockDB));
+  serviceLocator.register(`articleService`, new ArticleService(mockDB));
+  serviceLocator.register(`categoryService`, new CategoryService(mockDB));
   serviceLocator.factory(`articles`, articles);
   serviceLocator.get(`articles`);
 
@@ -96,16 +98,6 @@ describe(`API refuses to create a post if data is invalid`, () => {
     app = await createAPI();
   });
 
-  test(`Without any required property response code is 400`, async () => {
-    for (const key of Object.keys(newPost)) {
-      const badPost = {...newPost};
-      delete badPost[key];
-
-      await request(app).post(`/articles`).send(badPost)
-        .expect(HttpCode.BAD_REQUEST);
-    }
-  });
-
   test(`With any additional excess property response code is 400`, async () => {
 
     const badPost = {...newPost};
@@ -113,6 +105,123 @@ describe(`API refuses to create a post if data is invalid`, () => {
 
     await request(app).post(`/articles`).send(badPost)
       .expect(HttpCode.BAD_REQUEST);
+  });
+
+  describe(`Without required title property`, () => {
+    const badPost = {...newPost};
+    delete badPost.title;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.REQUIRED.TITLE));
+  });
+
+  describe(`Without required announce property`, () => {
+    const badPost = {...newPost};
+    delete badPost.announce;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.REQUIRED.ANNOUNCE));
+  });
+
+  describe(`Without required date property`, () => {
+    const badPost = {...newPost};
+    delete badPost.date;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.REQUIRED.DATE));
+  });
+
+  describe(`Without required categories property`, () => {
+    const badPost = {...newPost};
+    delete badPost.categories;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.REQUIRED.CATEGORIES));
+  });
+
+  describe(`With invalid date`, () => {
+    const badPost = {...newPost};
+    badPost.date = `07 Febraury 2009`;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.VALID.DATE));
+  });
+
+  describe(`With invalid category id`, () => {
+    const badPost = {...newPost};
+    badPost.categories = [1, 2, 123];
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.VALID.CATEGORIES));
+  });
+
+  describe(`With categories not in array`, () => {
+    const badPost = {...newPost};
+    badPost.categories = `123`;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.VALID.CATEGORIES));
+  });
+
+  describe(`With title length less than min value`, () => {
+    const badPost = {...newPost};
+    badPost .title = `Тест`;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.MIN_TITLE_LENGTH));
+  });
+
+  describe(`With announce length less than min value`, () => {
+    const badPost = {...newPost};
+    badPost.announce = `Короткий анонс`;
+    let response;
+
+    beforeAll(async () => {
+      response = await request(app).post(`/articles`).send(badPost);
+    });
+
+    test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
+    test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.MIN_ANNOUNCE_LENGTH));
   });
 });
 
@@ -132,7 +241,7 @@ describe(`API changes existent post`, () => {
   test(`Returns message of success updating`, () => expect(response.text).toBe(`Post was updated`));
 
   test(`Post is really changed`, () => request(app).get(`/articles/4`)
-    .expect((res) => expect(res.body.title).toBe(`Статья про котиков`))
+    .expect((res) => expect(res.body.title).toBe(`Хорошая валидная статья про котиков`))
   );
 });
 

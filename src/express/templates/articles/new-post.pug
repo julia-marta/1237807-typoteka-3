@@ -5,15 +5,15 @@ block content
     section
       .popup.popup--new-publication.popup--anti
         .new-publication
-          form(action="/articles/add", method="post", enctype="multipart/form-data", autocomplete="off")
+          form(action=(article && article.id ? `/articles/edit/${article.id}` : `/articles/add`), method="post", enctype="multipart/form-data", autocomplete="off")
             .new-publication__header
-              h1 Новая публикация
+              h1 #{article && article.id ? `Редактирование публикации` : `Новая публикация`}
               .new-publication__date-form
                 h3 Дата публикации
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for="new-publication-date", aria-label="Календарь")
-                    input#new-publication-date(type="text", name="date", placeholder="2019-03-21")
+                    input#new-publication-date(type="text", name="date", placeholder=(new Date().toISOString()), value=`${article ? article.date : new Date().toISOString()}`)
               button.new-publication__button.button.button--colored(type="submit") Опубликовать
             a.popup__button.button.button--popup-close(aria-label="Закрыть окно") Закрыть окно
             .new-publication__form.form
@@ -30,13 +30,13 @@ block content
                       | Обзор
 
                   if article && article.image
-                    button.button.button--transparent Удалить
+                    button.button.button--transparent(type="button") Удалить
 
                 .new-publication__category-wrapper
 
                   each category in categories
                     .new-publication__checkbox(class=`new-publication__checkbox--${category.id}`)
-                      input(id=`checkbox-${category.id}`, type="checkbox", name="category", value=category.id checked=(article ? article.categories.some(item => item.id === category.id) : false))
+                      input(id=`checkbox-${category.id}`, type="checkbox", name="category", value=category.id, checked=(article ? article.categories.some(item => item === (category.id).toString()) : false))
                       label(for=`checkbox-${category.id}`) #{category.name}
 
                   a.new-publication__form-link.button.button--transparent(href="/categories") Добавить категорию
@@ -47,3 +47,9 @@ block content
                 .form__field.form__field--publication-text
                   label
                     textarea(rows="10", name="full-text", placeholder="Полный текст публикации") #{article ? article.fullText : ``}
+                if errorMessages
+                  .form__validation-error
+                    p.form__error-message При вводе данных произошли ошибки:
+                    ul.form__errors
+                      each error in errorMessages
+                        li.form__error #{error}

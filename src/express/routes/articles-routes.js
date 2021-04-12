@@ -15,7 +15,8 @@ articlesRouter.get(`/add`, async (req, res, next) => {
 
   try {
     const categories = await api.getCategories();
-    req.session.destroy();
+    req.session.article = null;
+    req.session.errorMessages = null;
     res.render(`articles/new-post`, {categories, article, errorMessages});
   } catch (err) {
     next(err);
@@ -64,7 +65,8 @@ articlesRouter.get(`/edit/:id`, async (req, res, next) => {
       ]), []);
       article = {...article, categories: articleCategories};
     }
-    req.session.destroy();
+    req.session.newData = null;
+    req.session.errorMessages = null;
     res.render(`articles/new-post`, {article, categories, errorMessages});
   } catch (err) {
     next(err);
@@ -109,7 +111,7 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
       return article.categories.some((item) => item.id === category.id);
     });
 
-    req.session.destroy();
+    req.session.errorMessages = null;
     res.render(`articles/post`, {article, categories, errorMessages});
   } catch (err) {
     next(err);

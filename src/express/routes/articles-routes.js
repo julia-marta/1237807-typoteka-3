@@ -10,9 +10,13 @@ const api = apiFactory.getAPI();
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles/articles-by-category`));
 
 articlesRouter.get(`/add`, async (req, res, next) => {
+
+  const {article = null, errorMessages = null} = req.session;
+
   try {
     const categories = await api.getCategories();
-    res.render(`articles/new-post`, {categories});
+    req.session.destroy();
+    res.render(`articles/new-post`, {categories, article, errorMessages});
   } catch (err) {
     next(err);
   }
@@ -33,30 +37,35 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
 
   try {
     await api.createArticle(articleData);
-    res.redirect(`/my`);
+    return res.redirect(`/my`);
   } catch (error) {
-    const categories = await api.getCategories();
-    const errorMessages = error.response.data.errorMessages;
+    req.session.article = articleData;
+    req.session.errorMessages = error.response.data.errorMessages;
 
-    res.render(`articles/new-post`, {article: articleData, categories, errorMessages});
+    return res.redirect(`/articles/add`);
   }
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res, next) => {
   const {id} = req.params;
+  const {newData = null, errorMessages = null} = req.session;
 
   try {
-    const [article, categories] = await Promise.all([
-      api.getArticle(id),
-      api.getCategories()
-    ]);
+    const categories = await api.getCategories();
+    let article;
 
-    const articleCategories = article.categories.reduce((acc, item) => ([
-      item.id.toString(),
-      ...acc
-    ]), []);
-
-    res.render(`articles/new-post`, {article: {...article, categories: articleCategories}, categories});
+    if (newData) {
+      article = {...newData, id};
+    } else {
+      article = await api.getArticle(id);
+      const articleCategories = article.categories.reduce((acc, item) => ([
+        item.id.toString(),
+        ...acc
+      ]), []);
+      article = {...article, categories: articleCategories};
+    }
+    req.session.destroy();
+    res.render(`articles/new-post`, {article, categories, errorMessages});
   } catch (err) {
     next(err);
   }
@@ -77,17 +86,18 @@ articlesRouter.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
 
   try {
     await api.updateArticle(id, newData);
-    res.redirect(`/my`);
+    return res.redirect(`/my`);
   } catch (error) {
-    const categories = await api.getCategories();
-    const errorMessages = error.response.data.errorMessages;
+    req.session.newData = newData;
+    req.session.errorMessages = error.response.data.errorMessages;
 
-    res.render(`articles/new-post`, {article: {...newData, id}, categories, errorMessages});
+    return res.redirect(`/articles/edit/${id}`);
   }
 });
 
 articlesRouter.get(`/:id`, async (req, res, next) => {
   const {id} = req.params;
+  const {errorMessages = null} = req.session;
 
   try {
     const [article, allCategories] = await Promise.all([
@@ -99,7 +109,8 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
       return article.categories.some((item) => item.id === category.id);
     });
 
-    res.render(`articles/post`, {article, categories});
+    req.session.destroy();
+    res.render(`articles/post`, {article, categories, errorMessages});
   } catch (err) {
     next(err);
   }
@@ -116,19 +127,10 @@ articlesRouter.post(`/:id`, upload.single(`upload`), async (req, res) => {
 
   try {
     await api.createComment(id, commentData);
-    res.redirect(`back`);
+    return res.redirect(`back`);
   } catch (error) {
-    const [article, allCategories] = await Promise.all([
-      api.getArticle(id, {comments: true}),
-      api.getCategories({count: true})
-    ]);
-
-    const categories = allCategories.filter((category) => {
-      return article.categories.some((item) => item.id === category.id);
-    });
-    const errorMessages = error.response.data.errorMessages;
-
-    res.render(`articles/post`, {article, categories, errorMessages});
+    req.session.errorMessages = error.response.data.errorMessages;
+    return res.redirect(`back`);
   }
 });
 

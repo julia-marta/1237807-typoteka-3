@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require(`express`);
+const expressSession = require(`express-session`);
 const path = require(`path`);
 
 const articlesRoutes = require(`./routes/articles-routes`);
@@ -16,6 +17,14 @@ const UPLOAD_DIR = `upload`;
 const TEMPLATES_DIR = `templates`;
 
 const app = express();
+
+
+app.use(expressSession({
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: `session_id`
+}));
 
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));

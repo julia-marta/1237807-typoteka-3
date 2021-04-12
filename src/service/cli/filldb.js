@@ -15,6 +15,8 @@ const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const logger = getLogger({});
 
+const MONTH_PERIOD = 3;
+
 const ArticleRestrict = {
   MIN: 3,
   MAX: 1000,
@@ -55,6 +57,16 @@ const readContent = async (filePath) => {
   }
 };
 
+const generateDate = () => {
+  const earliestDate = new Date();
+  earliestDate.setMonth(earliestDate.getMonth() - MONTH_PERIOD);
+  const minTimestamp = earliestDate - new Date(0);
+  const maxTimestamp = new Date() - new Date(0);
+  const randomTimestamp = getRandomInt(minTimestamp, maxTimestamp);
+  const createdDate = new Date(randomTimestamp);
+  return createdDate;
+};
+
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
     text: shuffleArray(comments)
@@ -66,6 +78,7 @@ const generateComments = (count, comments) => (
 const generateArticles = (count, titles, sentences, images, categories, comments) => (
   Array(count).fill({}).map(() => ({
     title: titles[getRandomInt(0, titles.length - 1)],
+    date: generateDate(),
     announce: shuffleArray(sentences).slice(0, getRandomInt(AnnounceRestrict.MIN, AnnounceRestrict.MAX)).join(` `),
     fullText: shuffleArray(sentences).slice(0, getRandomInt(FullTextRestrict.MIN, FullTextRestrict.MAX)).join(` `),
     image: images[getRandomInt(0, images.length - 1)],

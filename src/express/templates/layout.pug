@@ -21,12 +21,12 @@ html(lang="ru")
       .preview__toggle-wrapper
         ul.preview__pagination.pagination
           li
-            a.pagination__button.button.button--backwards(class=range.start===1 ? `button--disabled` : ``)(href=`${prefix}page=${page - 1}`, aria-label="Страница назад") Назад
+            a.pagination__button.button.button--backwards(class=(range.start===1 ? `button--disabled` : ``) href=`${prefix}page=${page - 1}`, aria-label="Страница назад") Назад
           while range.index++ < range.end
             li.pagination__item(class=range.index===page ? `pagination__item--active` : ``)
               a(class={active: range.index === page} href=`${prefix}page=${range.index}`)= range.index
           li
-            a.pagination__button.button.button--forward(class=range.end===totalPages ? `button--disabled` : ``)(href=`${prefix}page=${page + 1}`, aria-label="Страница вперед") Вперед
+            a.pagination__button.button.button--forward(class=(range.end===totalPages ? `button--disabled` : ``) href=`${prefix}page=${page + 1}`, aria-label="Страница вперед") Вперед
     div(class=`${wrapper || `wrapper`}`)
       include partials/header.pug
       block content

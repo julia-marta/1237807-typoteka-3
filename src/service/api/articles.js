@@ -3,17 +3,19 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
 const articleExists = require(`../middlewares/article-exists`);
-const articleValidator = require(`../middlewares/article-validator`);
+const schemaValidator = require(`../middlewares/schema-validator`);
+const articleSchema = require(`../schemas/article`);
 
 module.exports = (serviceLocator) => {
   const route = new Router();
 
   const app = serviceLocator.get(`app`);
   const service = serviceLocator.get(`articleService`);
+  const categoryService = serviceLocator.get(`categoryService`);
   const logger = serviceLocator.get(`logger`);
 
   const isPostExists = articleExists(service, logger);
-  const isPostValid = articleValidator(logger);
+  const isPostValid = schemaValidator(articleSchema, logger, categoryService);
 
   app.use(`/articles`, route);
 

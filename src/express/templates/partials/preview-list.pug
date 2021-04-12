@@ -10,7 +10,7 @@ ul.preview__list
         .preview__background
           img.preview__background-image(src=`/img/${article.image}`, width="460", height="240", alt=article.title)
 
-      +date(article.createdAt)
+      +date(article.date)
       h3.preview__name
         a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
       p.preview__text #{article.announce}

@@ -10,6 +10,10 @@ const define = (sequelize) => Article.init({
     type: DataTypes.STRING,
     allowNull: false
   },
+  date: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
   announce: {
     type: DataTypes.STRING,
     allowNull: false

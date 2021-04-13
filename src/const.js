@@ -36,6 +36,8 @@ module.exports.MAX_TEXT_LENGTH = 1000;
 
 module.exports.MIN_CATEGORIES_LENGTH = 1;
 
+module.exports.MIN_PASSWORD_LENGTH = 6;
+
 module.exports.ArticleMessage = {
 
   REQUIRED: {
@@ -59,6 +61,25 @@ module.exports.CommentMessage = {
   REQUIRED: `Сообщение не может быть пустым, напишите что-нибудь!`,
   MIN_TEXT_LENGTH: `Текст комментария должен быть не меньше 20 символов`,
   MAX_TEXT_LENGTH: `Текст объявления должен быть не больше 1000 символов`,
+};
+
+module.exports.UserMessage = {
+
+  REQUIRED: {
+    EMAIL: `Укажите ваш e-mail`,
+    FIRSTNAME: `Укажите ваше имя`,
+    LASTNAME: `Укажите вашу фамилию`,
+    PASSWORD: `Введите пароль`,
+    REPEAT: `Введите пароль ещё раз`,
+  },
+  VALID: {
+    EMAIL: `E-mail не валиден. Введите валидный адре электронной почты`,
+    FIRSTNAME: `Имя может содержать только буквы и не должно включать пробелы`,
+    LASTNAME: `Фамилия может содержать только буквы и не должна включать пробелы`,
+    REPEAT: `Пароли не совпадают. Проверьте введённые данные`
+  },
+  MIN_PASSWORD_LENGTH: `Пароль должен быть не меньше 6 символов`,
+  EMAIL_ALREADY_REGISTERED: `Пользователь с таким электронным адресом уже зарегистрирован`
 };
 
 module.exports.API_PREFIX = `/api`;

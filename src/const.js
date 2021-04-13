@@ -27,7 +27,6 @@ module.exports.Announce = {
   MAX_LENGTH: 250,
 };
 
-
 module.exports.Comment = {
   MIN_LENGTH: 20,
   MAX_LENGTH: 1000,
@@ -64,30 +63,9 @@ module.exports.CommentMessage = {
 
 module.exports.API_PREFIX = `/api`;
 
-const WrapperType = {
-  COLOR: `wrapper-color`,
-  NO_BACKGROUND: `wrapper wrapper--nobackground`,
-};
-
-const {COLOR, NO_BACKGROUND} = WrapperType;
-
-module.exports.PageStyle = {
-  "/search": {
-    wrapper: COLOR,
-  },
-  "/categories": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/my": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/my/comments": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/articles/add": {
-    type: `admin`
-  }
+module.exports.WrapperType = {
+  "/search": `wrapper-color`,
+  "/categories": `wrapper wrapper--nobackground`,
+  "/my": `wrapper wrapper--nobackground`,
+  "/my/comments": `wrapper wrapper--nobackground`
 };

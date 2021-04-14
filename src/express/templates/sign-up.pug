@@ -8,30 +8,31 @@ block content
         a.popup__button.button.button--popup-close(aria-label="Закрыть окно") Закрыть окно
         h2.popup__title Регистрация
         .popup__form.popup__form--active.form.form--register
-          form(action="#", method="get")
+          form(action="/register", method="post", enctype="multipart/form-data", autocomplete="off")
             .form__field
               label
-                input(type="email", name="email", placeholder="Электронная почта", required)
+                input(type="email", name="email", placeholder="Электронная почта", value=(user && user.email ? user.email : ``))
             .form__field
               label
-                input(type="text", name="name", placeholder="Имя", required)
+                input(type="text", name="name", placeholder="Имя", value=(user && user.firstname ? user.firstname : ``))
             .form__field
               label
-                input(type="text", name="surname", placeholder="Фамилия")
+                input(type="text", name="surname", placeholder="Фамилия", value=(user && user.lastname ? user.lastname : ``))
             .form__field
               label
-                input(type="password", name="password", placeholder="Пароль", required)
+                input(type="password", name="password", placeholder="Пароль", value=(user && user.password ? user.password : ``))
             .form__field
               label
-                input(type="password", name="repeat-password", placeholder="Повтор пароля", required)
-            .form__validation-error
-              p.form__error-message При регистрации произошли ошибки:
-              ul.form__errors
-                li.form__error Пароль не может состоять из двух букв
-                li.form__error Фамилия не должна быть смешной
+                input(type="password", name="repeat-password", placeholder="Повтор пароля", value=(user && user.repeat ? user.repeat : ``))
+            if errorMessages
+              .form__validation-error
+                p.form__error-message При регистрации произошли ошибки:
+                ul.form__errors
+                  each error in errorMessages
+                    li.form__error #{error}
             .form__image-loader
               a.form__avatar.avatar
-                img(src="/img/icons/smile.svg", alt="аватар пользователя")
+                img(src=(user && user.avatar ? `/img/${user.avatar}` : `/img/icons/smile.svg`), alt="аватар пользователя")
               label
                 input.visually-hidden(type="file", name="upload")
                 | Загрузить фото профиля

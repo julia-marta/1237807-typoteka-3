@@ -2,8 +2,9 @@
 
 const {Router} = require(`express`);
 const apiFactory = require(`../api`);
-const mainRouter = new Router();
+const {upload} = require(`../middlewares/multer`);
 const {getPagerRange} = require(`../../utils`);
+const mainRouter = new Router();
 
 const ARTICLES_PER_PAGE = 8;
 const PAGER_WIDTH = 2;
@@ -33,7 +34,41 @@ mainRouter.get(`/`, async (req, res, next) => {
   }
 });
 
-mainRouter.get(`/register`, (req, res) => res.render(`sign-up`));
+mainRouter.get(`/register`, async (req, res) => {
+
+  const {user = null, errorMessages = null} = req.session;
+
+  req.session.user = null;
+  req.session.errorMessages = null;
+  res.render(`sign-up`, {user, errorMessages});
+
+});
+
+mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
+
+  const {body, file} = req;
+
+  const userData = {
+    email: body.email,
+    firstname: body.name,
+    lastname: body.surname,
+    password: body.password,
+    repeat: body[`repeat-password`],
+    avatar: file ? file.filename : ``
+  };
+
+  try {
+    await api.createUser(userData);
+    return res.redirect(`/login`);
+  } catch (error) {
+    req.session.user = userData;
+    req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/register`);
+  }
+});
+
+
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
 
 mainRouter.get(`/search`, async (req, res) => {

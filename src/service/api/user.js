@@ -19,9 +19,14 @@ module.exports = (serviceLocator) => {
   app.use(`/user`, route);
 
   route.post(`/`, [isUserValid, isUserAlreadyExists], async (req, res) => {
-    const user = await service.add(req.body);
 
-    return res.status(HttpCode.CREATED).json(user);
+    try {
+      const user = await service.add(req.body);
+      return res.status(HttpCode.CREATED).json(user);
+    } catch (err) {
+      logger.error(`Can't get user service.`);
+      return res.status(HttpCode.BAD_REQUEST).json({errorMessages: [`Something wrong`]});
+    }
   });
 
   return route;

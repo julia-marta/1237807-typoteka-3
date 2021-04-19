@@ -27,11 +27,13 @@ class UserService {
 
   async findByEmail(email) {
 
-    return this._User.findOne({
+    const user = await this._User.findOne({
       where: {
         email,
       },
     });
+
+    return user;
   }
 }
 

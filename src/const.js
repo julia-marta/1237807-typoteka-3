@@ -27,7 +27,6 @@ module.exports.Announce = {
   MAX_LENGTH: 250,
 };
 
-
 module.exports.Comment = {
   MIN_LENGTH: 20,
   MAX_LENGTH: 1000,
@@ -36,6 +35,8 @@ module.exports.Comment = {
 module.exports.MAX_TEXT_LENGTH = 1000;
 
 module.exports.MIN_CATEGORIES_LENGTH = 1;
+
+module.exports.MIN_PASSWORD_LENGTH = 6;
 
 module.exports.ArticleMessage = {
 
@@ -62,32 +63,30 @@ module.exports.CommentMessage = {
   MAX_TEXT_LENGTH: `Текст объявления должен быть не больше 1000 символов`,
 };
 
-module.exports.API_PREFIX = `/api`;
+module.exports.UserMessage = {
 
-const WrapperType = {
-  COLOR: `wrapper-color`,
-  NO_BACKGROUND: `wrapper wrapper--nobackground`,
+  REQUIRED: {
+    EMAIL: `Укажите ваш e-mail`,
+    FIRSTNAME: `Укажите ваше имя`,
+    LASTNAME: `Укажите вашу фамилию`,
+    PASSWORD: `Введите пароль`,
+    REPEAT: `Введите пароль ещё раз`,
+  },
+  VALID: {
+    EMAIL: `E-mail не валиден. Введите валидный адре электронной почты`,
+    FIRSTNAME: `Имя может содержать только буквы и не должно включать пробелы`,
+    LASTNAME: `Фамилия может содержать только буквы и не должна включать пробелы`,
+    REPEAT: `Пароли не совпадают. Проверьте введённые данные`
+  },
+  MIN_PASSWORD_LENGTH: `Пароль должен быть не меньше 6 символов`,
+  EMAIL_ALREADY_REGISTERED: `Пользователь с таким электронным адресом уже зарегистрирован`
 };
 
-const {COLOR, NO_BACKGROUND} = WrapperType;
+module.exports.API_PREFIX = `/api`;
 
-module.exports.PageStyle = {
-  "/search": {
-    wrapper: COLOR,
-  },
-  "/categories": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/my": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/my/comments": {
-    wrapper: NO_BACKGROUND,
-    type: `admin`
-  },
-  "/articles/add": {
-    type: `admin`
-  }
+module.exports.WrapperType = {
+  "/search": `wrapper-color`,
+  "/categories": `wrapper wrapper--nobackground`,
+  "/my": `wrapper wrapper--nobackground`,
+  "/my/comments": `wrapper wrapper--nobackground`
 };

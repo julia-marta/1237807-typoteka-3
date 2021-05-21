@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
+const wrapper = require(`../middlewares/wrapper`);
 const {getPagerRange} = require(`../../utils`);
 const mainRouter = new Router();
 
@@ -68,10 +69,39 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
   }
 });
 
+mainRouter.get(`/login`, async (req, res) => {
 
-mainRouter.get(`/login`, (req, res) => res.render(`login`));
+  const {userEmail = null, errorMessages = null} = req.session;
 
-mainRouter.get(`/search`, async (req, res) => {
+  req.session.userEmail = null;
+  req.session.errorMessages = null;
+  res.render(`login`, {userEmail, errorMessages});
+
+});
+
+mainRouter.post(`/login`, upload.single(`upload`), async (req, res) => {
+
+  const {body} = req;
+
+  const loginData = {
+    email: body.email,
+    password: body.password,
+  };
+
+  try {
+    const loggedUser = await api.loginUser(loginData);
+    req.session.isLogged = true;
+    req.session.loggedUser = loggedUser;
+    return res.redirect(`/`);
+  } catch (error) {
+    req.session.userEmail = loginData.email;
+    req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/login`);
+  }
+});
+
+mainRouter.get(`/search`, wrapper, async (req, res) => {
 
   if (!req.query.search) {
     res.render(`search`);
@@ -92,7 +122,7 @@ mainRouter.get(`/search`, async (req, res) => {
   });
 });
 
-mainRouter.get(`/categories`, async (req, res, next) => {
+mainRouter.get(`/categories`, wrapper, async (req, res, next) => {
   try {
     const categories = await api.getCategories();
 

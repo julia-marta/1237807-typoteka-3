@@ -2,11 +2,12 @@
 
 const {Router} = require(`express`);
 const apiFactory = require(`../api`);
+const wrapper = require(`../middlewares/wrapper`);
 const myRouter = new Router();
 
 const api = apiFactory.getAPI();
 
-myRouter.get(`/`, async (req, res, next) => {
+myRouter.get(`/`, wrapper, async (req, res, next) => {
   try {
     const articles = await api.getArticles();
     res.render(`my/my`, {articles});
@@ -15,7 +16,7 @@ myRouter.get(`/`, async (req, res, next) => {
   }
 });
 
-myRouter.get(`/comments`, async (req, res, next) => {
+myRouter.get(`/comments`, wrapper, async (req, res, next) => {
   try {
     const articles = await api.getArticles({comments: true});
     res.render(`my/comments`, {articles: articles.slice(0, 3)});

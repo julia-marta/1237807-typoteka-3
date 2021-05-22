@@ -4,6 +4,7 @@ const {Router} = require(`express`);
 const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
 const wrapper = require(`../middlewares/wrapper`);
+const privateRoute = require(`../middlewares/private-route`);
 const {getPagerRange} = require(`../../utils`);
 const mainRouter = new Router();
 
@@ -91,6 +92,7 @@ mainRouter.post(`/login`, upload.single(`upload`), async (req, res) => {
   try {
     const loggedUser = await api.loginUser(loginData);
     req.session.isLogged = true;
+    req.session.isAdmin = loggedUser.admin;
     req.session.loggedUser = loggedUser;
     return res.redirect(`/`);
   } catch (error) {
@@ -122,7 +124,7 @@ mainRouter.get(`/search`, wrapper, async (req, res) => {
   });
 });
 
-mainRouter.get(`/categories`, wrapper, async (req, res, next) => {
+mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
   try {
     const categories = await api.getCategories();
 

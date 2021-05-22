@@ -99,5 +99,5 @@ module.exports.WrapperType = {
   "/search": `wrapper-color`,
   "/categories": `wrapper wrapper--nobackground`,
   "/my": `wrapper wrapper--nobackground`,
-  "/comments": `wrapper wrapper--nobackground`
+  "/my/comments": `wrapper wrapper--nobackground`
 };

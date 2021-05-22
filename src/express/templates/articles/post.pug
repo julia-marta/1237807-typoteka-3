@@ -38,14 +38,21 @@ block content
                       p Евгений Петров •
                       +date(comment.createdAt)(class=`comments__date`)
                     p.comments__message #{comment.text}
-
-          .comments__footer.comments__footer--user
-            form(action=`/articles/${article.id}`, method="POST", enctype="multipart/form-data", autocomplete="off")
-              .comments__avatar.avatar
-                img(src="/img/avatar-2.png", alt="аватар пользователя")
-              label
-                textarea(rows="1", name="message", placeholder="Присоединиться к обсуждению")
-              button.comments__button.button.button--colored(type="submit") Опубликовать
-            if errorMessages
-              each error in errorMessages
-                p.comments__error #{error}
+          if session.isLogged
+            .comments__footer.comments__footer--user
+              form(action=`/articles/${article.id}`, method="POST", enctype="multipart/form-data", autocomplete="off")
+                .comments__avatar.avatar
+                  img(src="/img/avatar-2.png", alt="аватар пользователя")
+                label
+                  textarea(rows="1", name="message", placeholder="Присоединиться к обсуждению")
+                button.comments__button.button.button--colored(type="submit") Опубликовать
+              if errorMessages
+                each error in errorMessages
+                  p.comments__error #{error}
+          else
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href="/login") Войти
+              .comments__registration
+                p.text.text--signature
+                  b.title.title--small Регистрация
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться

@@ -15,7 +15,7 @@ header.header
         li.navigation__item
           a(href="/my/comments") Комментарии
         li.navigation__item
-          a(href="/") Выход
+          a(href="/logout") Выход
 
   else if session.loggedUser
     nav.header__nav
@@ -23,7 +23,7 @@ header.header
         li.header__list-item
           p #{session.loggedUser.firstname} #{session.loggedUser.lastname}
         li.header__list-item
-          a.header__exit(href='#') Выйти
+          a.header__exit(href="/logout") Выйти
     a.header__avatar.avatar
       img(src=`/img/${session.loggedUser.avatar}`, alt='аватар пользователя')
 

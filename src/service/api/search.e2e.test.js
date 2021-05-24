@@ -8,7 +8,7 @@ const search = require(`./search`);
 const DataService = require(`../data-service/search`);
 const serviceLocatorFactory = require(`../lib/service-locator`);
 const {getLogger} = require(`../lib/test-logger`);
-const {mockArticles, mockCategories} = require(`./search.test-data`);
+const {mockArticles, mockCategories, mockUsers, mockComments} = require(`./search.test-data`);
 const {HttpCode} = require(`../../const`);
 
 
@@ -19,7 +19,7 @@ const logger = getLogger();
 app.use(express.json());
 
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers, comments: mockComments});
   serviceLocator.register(`app`, app);
   serviceLocator.register(`logger`, logger);
   serviceLocator.register(`searchService`, new DataService(mockDB));

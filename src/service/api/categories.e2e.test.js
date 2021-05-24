@@ -7,7 +7,7 @@ const initDB = require(`../lib/init-db`);
 const categories = require(`./categories`);
 const DataService = require(`../data-service/category`);
 const serviceLocatorFactory = require(`../lib/service-locator`);
-const {mockArticles, mockCategories} = require(`./categories.test-data`);
+const {mockArticles, mockCategories, mockUsers, mockComments} = require(`./categories.test-data`);
 const {HttpCode} = require(`../../const`);
 
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {articles: mockArticles, categories: mockCategories, users: mockUsers, comments: mockComments});
   serviceLocator.register(`app`, app);
   serviceLocator.register(`categoryService`, new DataService(mockDB));
   serviceLocator.factory(`categories`, categories);

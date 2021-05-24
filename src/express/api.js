@@ -40,6 +40,10 @@ class API {
     return this._load(`/categories`, {params: {count}});
   }
 
+  getAllComments() {
+    return this._load(`/allcomments`);
+  }
+
   createArticle(data) {
     return this._load(`/articles`, {
       method: `POST`,
@@ -54,10 +58,23 @@ class API {
     });
   }
 
-  createComment(id, data) {
+  deleteArticle(articleId) {
+    return this._load(`/articles/${articleId}`, {
+      method: `DELETE`,
+    });
+  }
+
+  createComment(id, userId, data) {
     return this._load(`/articles/${id}/comments`, {
       method: `POST`,
+      params: {userId},
       data
+    });
+  }
+
+  deleteComment(id, articleId) {
+    return this._load(`/articles/${articleId}/comments/${id}`, {
+      method: `DELETE`
     });
   }
 

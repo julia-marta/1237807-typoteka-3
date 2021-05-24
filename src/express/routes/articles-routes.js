@@ -123,6 +123,7 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
 articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, res) => {
 
   const {id} = req.params;
+  const userId = req.session.loggedUser.id;
   const {body} = req;
 
   const commentData = {
@@ -130,7 +131,7 @@ articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, 
   };
 
   try {
-    await api.createComment(id, commentData);
+    await api.createComment(id, userId, commentData);
     return res.redirect(`back`);
   } catch (error) {
     req.session.errorMessages = error.response.data.errorMessages;

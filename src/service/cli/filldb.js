@@ -12,10 +12,15 @@ const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_IMAGES_PATH = `./data/images.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
+const FILE_NAMES_PATH = `./data/names.txt`;
+const FILE_SURNAMES_PATH = `./data/surnames.txt`;
+const FILE_EMAILS_PATH = `./data/emails.txt`;
 
 const logger = getLogger({});
 
 const MONTH_PERIOD = 3;
+const USERS_COUNT = 5;
+const DEFAULT_PASSWORD = `$2b$10$Wg4P.Qy.zhnYdUPKGfni8uPMdj08DcjQWwrbkg6bOWT.u2cYiXlAC`;
 
 const ArticleRestrict = {
   MIN: 3,
@@ -24,7 +29,7 @@ const ArticleRestrict = {
 
 const AnnounceRestrict = {
   MIN: 1,
-  MAX: 3,
+  MAX: 2,
 };
 
 const FullTextRestrict = {
@@ -47,6 +52,11 @@ const CommentLengthRestrict = {
   MAX: 3,
 };
 
+const AvatarRestrict = {
+  MIN: 1,
+  MAX: 5,
+};
+
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf8`);
@@ -56,6 +66,8 @@ const readContent = async (filePath) => {
     return [];
   }
 };
+
+const getAvatarName = (number) => `avatar-${number}.png`;
 
 const generateDate = () => {
   const earliestDate = new Date();
@@ -67,15 +79,28 @@ const generateDate = () => {
   return createdDate;
 };
 
-const generateComments = (count, comments) => (
+const generateUsers = (count, names, surnames, emails) => (
+  Array(count).fill({}).map((_, index) => ({
+    firstname: names[getRandomInt(0, names.length - 1)],
+    lastname: surnames[getRandomInt(0, surnames.length - 1)],
+    email: emails[index],
+    password: DEFAULT_PASSWORD,
+    avatar: getAvatarName(getRandomInt(AvatarRestrict.MIN, AvatarRestrict.MAX)),
+    admin: index === 0
+  }))
+);
+
+const generateArticleComments = (count, comments, article, usersCount) => (
   Array(count).fill({}).map(() => ({
     text: shuffleArray(comments)
       .slice(0, getRandomInt(CommentLengthRestrict.MIN, CommentLengthRestrict.MAX))
       .join(` `),
+    articleId: article,
+    userId: getRandomInt(1, usersCount)
   }))
 );
 
-const generateArticles = (count, titles, sentences, images, categories, comments) => (
+const generateArticles = (count, titles, sentences, images, categories) => (
   Array(count).fill({}).map(() => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     date: generateDate(),
@@ -83,9 +108,18 @@ const generateArticles = (count, titles, sentences, images, categories, comments
     fullText: shuffleArray(sentences).slice(0, getRandomInt(FullTextRestrict.MIN, FullTextRestrict.MAX)).join(` `),
     image: images[getRandomInt(0, images.length - 1)],
     categories: shuffleArray(categories).slice(0, getRandomInt(CategoriesRestrict.MIN, CategoriesRestrict.MAX)),
-    comments: generateComments(getRandomInt(CommentsRestrict.MIN, CommentsRestrict.MAX), comments),
   }))
 );
+
+const generateComments = (comments, count, usersCount) => {
+
+  return Array(count).fill().reduce((allComments, _, index) => {
+
+    return allComments.concat(
+        generateArticleComments(getRandomInt(CommentsRestrict.MIN, CommentsRestrict.MAX), comments, index + 1, usersCount)
+    );
+  }, []);
+};
 
 module.exports = {
   name: `--filldb`,
@@ -105,7 +139,10 @@ module.exports = {
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const images = await readContent(FILE_IMAGES_PATH);
-    const comments = await readContent(FILE_COMMENTS_PATH);
+    const commentsSentences = await readContent(FILE_COMMENTS_PATH);
+    const names = await readContent(FILE_NAMES_PATH);
+    const surnames = await readContent(FILE_SURNAMES_PATH);
+    const emails = await readContent(FILE_EMAILS_PATH);
 
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || ArticleRestrict.MIN;
@@ -117,8 +154,11 @@ module.exports = {
 
     const countArticle = countNumber > ArticleRestrict.MIN ? countNumber : ArticleRestrict.MIN;
 
-    const articles = generateArticles(countArticle, titles, sentences, images, categories, comments);
+    const users = generateUsers(USERS_COUNT, names, surnames, emails);
+    const articles = generateArticles(countArticle, titles, sentences, images, categories);
+    const comments = generateComments(commentsSentences, countArticle, USERS_COUNT);
 
-    return initDatabase(sequelize, {articles, categories});
+
+    return initDatabase(sequelize, {articles, categories, users, comments});
   }
 };

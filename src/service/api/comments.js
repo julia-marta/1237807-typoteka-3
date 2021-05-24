@@ -17,17 +17,24 @@ module.exports = (serviceLocator) => {
   const isPostExists = articleExists(articleService, logger);
   const isCommentValid = schemaValidator(commentSchema, logger);
 
-  app.use(`/articles/:articleId/comments`, route);
+  app.use(`/`, route);
 
-  route.get(`/`, isPostExists, async (req, res) => {
-    const {post} = res.locals;
+  route.get(`/allcomments`, async (req, res) => {
 
-    const comments = await commentService.findAll(post.id);
+    const comments = await commentService.findAll();
 
     return res.status(HttpCode.OK).json(comments);
   });
 
-  route.delete(`/:commentId`, isPostExists, async (req, res) => {
+  route.get(`/articles/:articleId/comments`, isPostExists, async (req, res) => {
+    const {post} = res.locals;
+
+    const comments = await commentService.findAllByArticle(post.id);
+
+    return res.status(HttpCode.OK).json(comments);
+  });
+
+  route.delete(`/articles/:articleId/comments/:commentId`, isPostExists, async (req, res) => {
     const {commentId} = req.params;
 
     const deleted = await commentService.delete(commentId);
@@ -40,10 +47,11 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).send(`Comment was deleted`);
   });
 
-  route.post(`/`, [isPostExists, isCommentValid], async (req, res) => {
+  route.post(`/articles/:articleId/comments`, [isPostExists, isCommentValid], async (req, res) => {
     const {post} = res.locals;
+    const {userId} = req.query;
 
-    const comment = await commentService.create(post.id, req.body);
+    const comment = await commentService.create(post.id, userId, req.body);
 
     return res.status(HttpCode.CREATED).json(comment);
   });

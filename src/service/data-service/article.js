@@ -29,7 +29,10 @@ class ArticleService {
       include.push(Aliase.COMMENTS);
     }
 
-    const articles = await this._Article.findAll({include});
+    const articles = await this._Article.findAll({
+      include,
+      order: [[`date`, `DESC`]]
+    });
 
     return articles.map((article) => article.get());
   }
@@ -38,7 +41,11 @@ class ArticleService {
     const include = [Aliase.CATEGORIES];
 
     if (withComments) {
-      include.push(Aliase.COMMENTS);
+      include.push({
+        model: this._Comment,
+        as: Aliase.COMMENTS,
+        include: [Aliase.USERS],
+      });
     }
 
     return this._Article.findByPk(id, {include});

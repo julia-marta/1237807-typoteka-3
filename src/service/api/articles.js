@@ -12,6 +12,7 @@ module.exports = (serviceLocator) => {
   const app = serviceLocator.get(`app`);
   const service = serviceLocator.get(`articleService`);
   const categoryService = serviceLocator.get(`categoryService`);
+  const commentService = serviceLocator.get(`commentService`);
   const logger = serviceLocator.get(`logger`);
 
   const isPostExists = articleExists(service, logger);
@@ -52,15 +53,11 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).send(`Post was updated`);
   });
 
-  route.delete(`/:articleId`, async (req, res) => {
+  route.delete(`/:articleId`, isPostExists, async (req, res) => {
     const {articleId} = req.params;
 
-    const deleted = await service.delete(articleId);
-
-    if (!deleted) {
-      res.status(HttpCode.NOT_FOUND).send(`Post with ${articleId} not found`);
-      return logger.error(`Post not found: ${articleId}`);
-    }
+    await commentService.deleteAllByArticle(articleId);
+    await service.delete(articleId);
 
     return res.status(HttpCode.OK).send(`Post was deleted`);
   });

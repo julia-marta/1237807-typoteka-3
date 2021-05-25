@@ -1,8 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
+const csrf = require(`csurf`);
 const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
+const wrapper = require(`../middlewares/wrapper`);
+const privateRoute = require(`../middlewares/private-route`);
 const {getPagerRange} = require(`../../utils`);
 const mainRouter = new Router();
 
@@ -10,6 +13,12 @@ const ARTICLES_PER_PAGE = 8;
 const PAGER_WIDTH = 2;
 
 const api = apiFactory.getAPI();
+
+const csrfProtection = csrf({
+  value: (req) => {
+    return req.body.csrf;
+  }
+});
 
 mainRouter.get(`/`, async (req, res, next) => {
 
@@ -34,17 +43,19 @@ mainRouter.get(`/`, async (req, res, next) => {
   }
 });
 
-mainRouter.get(`/register`, async (req, res) => {
+mainRouter.get(`/register`, csrfProtection, async (req, res) => {
 
   const {user = null, errorMessages = null} = req.session;
 
+  const csrfToken = req.csrfToken();
+
   req.session.user = null;
   req.session.errorMessages = null;
-  res.render(`sign-up`, {user, errorMessages});
+  res.render(`sign-up`, {user, errorMessages, csrfToken});
 
 });
 
-mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
+mainRouter.post(`/register`, upload.single(`upload`), csrfProtection, async (req, res) => {
 
   const {body, file} = req;
 
@@ -68,10 +79,48 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
   }
 });
 
+mainRouter.get(`/login`, csrfProtection, async (req, res) => {
 
-mainRouter.get(`/login`, (req, res) => res.render(`login`));
+  const {userEmail = null, errorMessages = null} = req.session;
 
-mainRouter.get(`/search`, async (req, res) => {
+  const csrfToken = req.csrfToken();
+
+  req.session.userEmail = null;
+  req.session.errorMessages = null;
+  res.render(`login`, {userEmail, errorMessages, csrfToken});
+
+});
+
+mainRouter.post(`/login`, upload.single(`upload`), csrfProtection, async (req, res) => {
+
+  const {body} = req;
+
+  const loginData = {
+    email: body.email,
+    password: body.password,
+  };
+
+  try {
+    const loggedUser = await api.loginUser(loginData);
+    req.session.isLogged = true;
+    req.session.isAdmin = loggedUser.admin;
+    req.session.loggedUser = loggedUser;
+    return res.redirect(`/`);
+  } catch (error) {
+    req.session.userEmail = loginData.email;
+    req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/login`);
+  }
+});
+
+mainRouter.get(`/logout`, async (req, res) => {
+  req.session.destroy(() => {
+    res.redirect(`/login`);
+  });
+});
+
+mainRouter.get(`/search`, wrapper, async (req, res) => {
 
   if (!req.query.search) {
     res.render(`search`);
@@ -92,7 +141,7 @@ mainRouter.get(`/search`, async (req, res) => {
   });
 });
 
-mainRouter.get(`/categories`, async (req, res, next) => {
+mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
   try {
     const categories = await api.getCategories();
 

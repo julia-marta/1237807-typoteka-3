@@ -7,14 +7,16 @@ const initDB = require(`../lib/init-db`);
 const articles = require(`./articles`);
 const ArticleService = require(`../data-service/article`);
 const CategoryService = require(`../data-service/category`);
+const CommentService = require(`../data-service/comment`);
 const serviceLocatorFactory = require(`../lib/service-locator`);
 const {getLogger} = require(`../lib/test-logger`);
-const {mockArticles, mockCategories, mockPost} = require(`./articles.test-data`);
+const {mockArticles, mockCategories, mockUsers, mockComments, mockPost} = require(`./articles.test-data`);
 const {HttpCode, ArticleMessage} = require(`../../const`);
+
 
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers, comments: mockComments});
   const serviceLocator = serviceLocatorFactory();
   const app = express();
   const logger = getLogger();
@@ -24,6 +26,7 @@ const createAPI = async () => {
   serviceLocator.register(`logger`, logger);
   serviceLocator.register(`articleService`, new ArticleService(mockDB));
   serviceLocator.register(`categoryService`, new CategoryService(mockDB));
+  serviceLocator.register(`commentService`, new CommentService(mockDB));
   serviceLocator.factory(`articles`, articles);
   serviceLocator.get(`articles`);
 

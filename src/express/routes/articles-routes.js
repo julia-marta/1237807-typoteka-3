@@ -3,13 +3,15 @@
 const {Router} = require(`express`);
 const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
+const privateRoute = require(`../middlewares/private-route`);
+const loggedRoute = require(`../middlewares/logged-route`);
 const articlesRouter = new Router();
 
 const api = apiFactory.getAPI();
 
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles/articles-by-category`));
 
-articlesRouter.get(`/add`, async (req, res, next) => {
+articlesRouter.get(`/add`, privateRoute, async (req, res, next) => {
 
   const {article = null, errorMessages = null} = req.session;
 
@@ -23,7 +25,7 @@ articlesRouter.get(`/add`, async (req, res, next) => {
   }
 });
 
-articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
+articlesRouter.post(`/add`, [privateRoute, upload.single(`upload`)], async (req, res) => {
 
   const {body, file} = req;
 
@@ -47,7 +49,7 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
   }
 });
 
-articlesRouter.get(`/edit/:id`, async (req, res, next) => {
+articlesRouter.get(`/edit/:id`, privateRoute, async (req, res, next) => {
   const {id} = req.params;
   const {newData = null, errorMessages = null} = req.session;
 
@@ -73,7 +75,7 @@ articlesRouter.get(`/edit/:id`, async (req, res, next) => {
   }
 });
 
-articlesRouter.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
+articlesRouter.post(`/edit/:id`, [privateRoute, upload.single(`upload`)], async (req, res) => {
   const {id} = req.params;
   const {body, file} = req;
 
@@ -118,9 +120,10 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
   }
 });
 
-articlesRouter.post(`/:id`, upload.single(`upload`), async (req, res) => {
+articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, res) => {
 
   const {id} = req.params;
+  const userId = req.session.loggedUser.id;
   const {body} = req;
 
   const commentData = {
@@ -128,7 +131,7 @@ articlesRouter.post(`/:id`, upload.single(`upload`), async (req, res) => {
   };
 
   try {
-    await api.createComment(id, commentData);
+    await api.createComment(id, userId, commentData);
     return res.redirect(`back`);
   } catch (error) {
     req.session.errorMessages = error.response.data.errorMessages;

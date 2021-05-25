@@ -7,7 +7,7 @@ const path = require(`path`);
 const articlesRoutes = require(`./routes/articles-routes`);
 const myRoutes = require(`./routes/my-routes`);
 const mainRoutes = require(`./routes/main-routes`);
-const {HttpCode, WrapperType} = require(`../const`);
+const {HttpCode} = require(`../const`);
 
 const DEFAULT_PORT = 8080;
 const PUBLIC_DIR = `public`;
@@ -31,14 +31,7 @@ app.set(`views`, path.resolve(__dirname, TEMPLATES_DIR));
 app.set(`view engine`, `pug`);
 
 app.use((req, res, next) => {
-  res.locals.type = `guest`;
-  next();
-});
-
-app.use((req, res, next) => {
-  if (WrapperType[req.url]) {
-    res.locals.wrapper = WrapperType[req.url];
-  }
+  res.locals.session = req.session;
   next();
 });
 

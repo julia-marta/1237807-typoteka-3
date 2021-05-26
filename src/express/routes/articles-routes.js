@@ -5,11 +5,37 @@ const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
 const privateRoute = require(`../middlewares/private-route`);
 const loggedRoute = require(`../middlewares/logged-route`);
-const articlesRouter = new Router();
+const {getPagerRange} = require(`../../utils`);
+const {ARTICLES_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
 
+const articlesRouter = new Router();
 const api = apiFactory.getAPI();
 
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles/articles-by-category`));
+articlesRouter.get(`/category/:id`, async (req, res, next) => {
+  const {id} = req.params;
+  let {page = 1} = req.query;
+  page = +page;
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  try {
+    const [{count, articles}, currentCategory, categories] = await Promise.all([
+      api.getArticlesByCategory(id, {limit, offset}),
+      api.getCategory(id),
+      api.getCategories({count: true})
+    ]);
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+    const range = getPagerRange(page, totalPages, PAGER_WIDTH);
+    const withPagination = totalPages > 1;
+
+    res.render(`articles/articles-by-category`, {currentCategory, count, articles, categories, page, totalPages, range, withPagination});
+  } catch (err) {
+
+    next(err);
+  }
+
+});
 
 articlesRouter.get(`/add`, privateRoute, async (req, res, next) => {
 

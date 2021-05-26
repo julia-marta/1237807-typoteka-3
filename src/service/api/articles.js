@@ -33,6 +33,20 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(result);
   });
 
+  route.get(`/category/:categoryId`, async (req, res) => {
+    const {categoryId} = req.params;
+    const {offset, limit} = req.query;
+    let result;
+
+    if (limit || offset) {
+      result = await service.findPageByCategory({limit, offset, categoryId});
+    } else {
+      result = await service.findAllByCategory(categoryId);
+    }
+
+    return res.status(HttpCode.OK).json(result);
+  });
+
   route.get(`/:articleId`, isPostExists, (req, res) => {
     const {post} = res.locals;
 

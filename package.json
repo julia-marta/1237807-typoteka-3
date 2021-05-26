@@ -12,7 +12,7 @@
     "server": "cross-env NODE_ENV=production LOG_LEVEL=error IS_DEV_MODE=false node -r dotenv/config ./src/service/service.js --server",
     "server::debug": "cross-env node -r dotenv/config ./src/service/service.js --server",
     "start-front-server": "cross-env nodemon -r dotenv/config ./src/express/index.js",
-    "fill-db": "npm run start -- --filldb"
+    "fill-db": "cross-env node -r dotenv/config ./src/service/service.js --filldb"
   },
   "repository": {
     "type": "git",

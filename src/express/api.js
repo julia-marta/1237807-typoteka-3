@@ -28,20 +28,28 @@ class API {
     return this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
-  getArticle(id, {comments} = {}) {
-    return this._load(`/articles/${id}`, {params: {comments}});
+  getArticlesByCategory(id, {offset, limit} = {}) {
+    return this._load(`/articles/category/${id}`, {params: {offset, limit}});
   }
 
-  search(query) {
-    return this._load(`/search`, {params: {query}});
+  getArticle(id, {comments} = {}) {
+    return this._load(`/articles/${id}`, {params: {comments}});
   }
 
   getCategories({count} = {}) {
     return this._load(`/categories`, {params: {count}});
   }
 
+  getCategory(id) {
+    return this._load(`/categories/${id}`);
+  }
+
   getAllComments() {
     return this._load(`/allcomments`);
+  }
+
+  search(query) {
+    return this._load(`/search`, {params: {query}});
   }
 
   createArticle(data) {

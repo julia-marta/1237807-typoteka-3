@@ -93,6 +93,10 @@ module.exports.LoginMessage = {
   WRONG_PASSWORD: `Неверный пароль`
 };
 
+module.exports.ARTICLES_PER_PAGE = 8;
+
+module.exports.PAGER_WIDTH = 2;
+
 module.exports.API_PREFIX = `/api`;
 
 module.exports.WrapperType = {

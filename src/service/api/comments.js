@@ -26,6 +26,14 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(comments);
   });
 
+  route.get(`/lastcomments`, async (req, res) => {
+    const {limit} = req.query;
+
+    const comments = await commentService.findLast(limit);
+
+    return res.status(HttpCode.OK).json(comments);
+  });
+
   route.get(`/articles/:articleId/comments`, isPostExists, async (req, res) => {
     const {post} = res.locals;
 

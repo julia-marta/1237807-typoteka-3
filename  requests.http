@@ -3,6 +3,11 @@ GET http://localhost:3000/api/articles HTTP/1.1
 
 ###
 
+# Список популярных публикаций
+GET http://localhost:3000/api/articles/popular?limit=5 HTTP/1.1
+
+###
+
 # Полная информация о публикации
 GET http://localhost:3000/api/articles/qhLyIT HTTP/1.1
 

@@ -9,6 +9,8 @@ const privateRoute = require(`../middlewares/private-route`);
 const {getPagerRange} = require(`../../utils`);
 const {ARTICLES_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
 
+const TOP_PER_PAGE = 4;
+
 const mainRouter = new Router();
 const api = apiFactory.getAPI();
 
@@ -23,19 +25,24 @@ mainRouter.get(`/`, async (req, res, next) => {
   let {page = 1} = req.query;
   page = +page;
   const limit = ARTICLES_PER_PAGE;
+  const topLimit = TOP_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
 
   try {
-    const [{count, articles}, categories] = await Promise.all([
+    const [{count, articles}, popularArticles, categories, lastComments] = await Promise.all([
       api.getArticles({limit, offset, comments: true}),
-      api.getCategories({count: true})
+      api.getPopularArticles({limit: topLimit}),
+      api.getCategories({count: true}),
+      api.getLastComments({limit: topLimit})
     ]);
+
+    console.log(lastComments);
 
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
     const range = getPagerRange(page, totalPages, PAGER_WIDTH);
     const withPagination = totalPages > 1;
 
-    res.render(`main`, {articles, categories, page, totalPages, range, withPagination});
+    res.render(`main`, {articles, popularArticles, categories, lastComments, page, totalPages, range, withPagination});
   } catch (err) {
     next(err);
   }

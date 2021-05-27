@@ -33,6 +33,22 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(result);
   });
 
+  route.get(`/popular`, async (req, res) => {
+    const {limit} = req.query;
+
+    const popularArticles = await service.findPopular(limit);
+
+    return res.status(HttpCode.OK).json(popularArticles);
+  });
+
+  route.get(`/last`, async (req, res) => {
+    const {limit} = req.query;
+
+    const lastOffers = await service.findLast(limit);
+
+    return res.status(HttpCode.OK).json(lastOffers);
+  });
+
   route.get(`/category/:categoryId`, async (req, res) => {
     const {categoryId} = req.params;
     const {offset, limit} = req.query;

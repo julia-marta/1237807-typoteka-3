@@ -1,5 +1,5 @@
 'use strict';
-
+const Sequelize = require(`sequelize`);
 const Aliase = require(`../models/aliase`);
 
 class ArticleService {
@@ -85,6 +85,27 @@ class ArticleService {
         where: {CategoryId: categoryId}
       }],
       order: [[`createdAt`, `DESC`]]
+    });
+
+    return articles.map((offer) => offer.get());
+  }
+
+  async findPopular(limit) {
+    const articles = await this._Article.findAll({
+      limit,
+      attributes: {
+        include: [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `count`]
+      },
+      include: [
+        {
+          model: this._Comment,
+          as: Aliase.COMMENTS,
+          attributes: [],
+          duplicating: false,
+        }
+      ],
+      group: [`Article.id`],
+      order: [[`count`, `DESC`]],
     });
 
     return articles.map((offer) => offer.get());

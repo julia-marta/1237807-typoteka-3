@@ -28,6 +28,10 @@ class API {
     return this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
+  getPopularArticles({limit} = {}) {
+    return this._load(`/articles/popular`, {params: {limit}});
+  }
+
   getArticlesByCategory(id, {offset, limit} = {}) {
     return this._load(`/articles/category/${id}`, {params: {offset, limit}});
   }
@@ -46,6 +50,10 @@ class API {
 
   getAllComments() {
     return this._load(`/allcomments`);
+  }
+
+  getLastComments({limit} = {}) {
+    return this._load(`/lastcomments`, {params: {limit}});
   }
 
   search(query) {

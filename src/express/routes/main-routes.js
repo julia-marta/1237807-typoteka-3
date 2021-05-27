@@ -36,8 +36,6 @@ mainRouter.get(`/`, async (req, res, next) => {
       api.getLastComments({limit: topLimit})
     ]);
 
-    console.log(lastComments);
-
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
     const range = getPagerRange(page, totalPages, PAGER_WIDTH);
     const withPagination = totalPages > 1;

@@ -14,7 +14,7 @@ block content
           if results && results.length > 0
             each article in results
               .search__result
-                +date(article.createdAt)(class=`search__date`)
+                +date(article.date)(class=`search__date`)
                 a.search__link(href=`/articles/${article.id}`)
                   | #{article.title.split(search)[0]}
                   b #{search}

@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
 const categoryExists = require(`../middlewares/category-exists`);
+const categoryUniqueName = require(`../middlewares/category-unique-name`);
 const categoryHasArticles = require(`../middlewares/category-has-articles`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const categorySchema = require(`../schemas/category`);
@@ -15,6 +16,7 @@ module.exports = (serviceLocator) => {
   const logger = serviceLocator.get(`logger`);
 
   const isCategoryExists = categoryExists(service, logger);
+  const isCategoryNameUnique = categoryUniqueName(service, logger);
   const isCategoryHasArticles = categoryHasArticles(service, logger);
   const isCategoryValid = schemaValidator(categorySchema, logger);
 
@@ -41,13 +43,13 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(category);
   });
 
-  route.post(`/`, isCategoryValid, async (req, res) => {
+  route.post(`/`, [isCategoryValid, isCategoryNameUnique], async (req, res) => {
     const category = await service.add(req.body);
 
     return res.status(HttpCode.CREATED).json(category);
   });
 
-  route.put(`/:categoryId`, [isCategoryExists, isCategoryValid], async (req, res) => {
+  route.put(`/:categoryId`, [isCategoryExists, isCategoryValid, isCategoryNameUnique], async (req, res) => {
     const {categoryId} = req.params;
 
     await service.update(categoryId, req.body);

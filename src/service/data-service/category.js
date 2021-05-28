@@ -39,6 +39,14 @@ class CategoryService {
     });
   }
 
+  findAllWithArticles(categoryId) {
+
+    return this._ArticleCategory.findAll({
+      raw: true,
+      where: {CategoryId: categoryId}
+    });
+  }
+
   async add(newCategory) {
     const category = await this._Category.create(newCategory);
 
@@ -51,6 +59,13 @@ class CategoryService {
     });
 
     return !!affectedRows;
+  }
+
+  async delete(id) {
+    const deletedRows = await this._Category.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
   }
 }
 

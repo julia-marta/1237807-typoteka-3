@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
 const categoryExists = require(`../middlewares/category-exists`);
+const categoryHasArticles = require(`../middlewares/category-has-articles`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const categorySchema = require(`../schemas/category`);
 
@@ -14,6 +15,7 @@ module.exports = (serviceLocator) => {
   const logger = serviceLocator.get(`logger`);
 
   const isCategoryExists = categoryExists(service, logger);
+  const isCategoryHasArticles = categoryHasArticles(service, logger);
   const isCategoryValid = schemaValidator(categorySchema, logger);
 
   app.use(`/categories`, route);
@@ -51,6 +53,14 @@ module.exports = (serviceLocator) => {
     await service.update(categoryId, req.body);
 
     return res.status(HttpCode.OK).send(`Category was updated`);
+  });
+
+  route.delete(`/:categoryId`, [isCategoryExists, isCategoryHasArticles], async (req, res) => {
+    const {categoryId} = req.params;
+
+    await service.delete(categoryId);
+
+    return res.status(HttpCode.OK).send(`Category was deleted`);
   });
 
   return route;

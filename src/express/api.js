@@ -115,6 +115,12 @@ class API {
     });
   }
 
+  deleteCategory(id) {
+    return this._load(`/categories/${id}`, {
+      method: `DELETE`,
+    });
+  }
+
   loginUser(data) {
     return this._load(`/user/login`, {
       method: `POST`,

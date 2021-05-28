@@ -17,11 +17,13 @@ block content
         each category in categories
           li.category__list-item
             form(action=`/categories/${category.id}`, method="POST", enctype="multipart/form-data")
-              input(id=`modify-form-category-${category.id}` type="text", name=`category-${category.id}`, value=(currentCategory && currentCategory.id === category.id ? currentCategory.name : category.name))
+              input(id=`modify-form-category-${category.id}` type="text", name=`category-${category.id}`, value=(updatedCategory && updatedCategory.id === category.id ? updatedCategory.name : category.name))
               label(for=`modify-form-category-${category.id}`)
                 span.visually-hidden Редактировать категорию
               button.category__button.button.button--category(type="submit") Сохранить
-              button.category__button.button.button--category(type="button") Удалить
-            if currentCategory && currentCategory.id === category.id && updateErrorMessages
+              a.category__button.button.button--category(href=`/categories/${category.id}`) Удалить
+            if updatedCategory && updatedCategory.id === category.id && updateErrorMessages
               each error in updateErrorMessages
                 p.form__error-message #{error}
+            if deletedCategoryId && deletedCategoryId === category.id && deleteErrorMessage
+              p.form__error-message #{deleteErrorMessage}

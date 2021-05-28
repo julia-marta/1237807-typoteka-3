@@ -72,6 +72,7 @@ module.exports.CategoryMessage = {
   REQUIRED: `Введите название категории`,
   MIN_TEXT_LENGTH: `Название категории должно быть не меньше 5 символов`,
   MAX_TEXT_LENGTH: `Название категории должно быть не больше 30 символов`,
+  HAS_ARTICLES: `Вы не можете удалить категорию, в которой уже есть статьи`
 };
 
 module.exports.UserMessage = {

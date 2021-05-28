@@ -146,15 +146,25 @@ mainRouter.get(`/search`, wrapper, async (req, res) => {
 
 mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
 
-  const {newCategory = null, errorMessages = null, currentCategory = null, updateErrorMessages = null} = req.session;
+  const {
+    newCategory = null,
+    errorMessages = null,
+    updatedCategory = null,
+    updateErrorMessages = null,
+    deletedCategoryId = null,
+    deleteErrorMessage = null,
+  } = req.session;
 
   try {
     const categories = await api.getCategories();
-    req.session.category = null;
+    req.session.newCategory = null;
     req.session.errorMessages = null;
-    req.session.currentCategory = null;
+    req.session.updatedCategory = null;
     req.session.updateErrorMessages = null;
-    res.render(`all-categories`, {categories, newCategory, errorMessages, currentCategory, updateErrorMessages});
+    req.session.deletedCategoryId = null;
+    req.session.deleteErrorMessage = null;
+
+    res.render(`all-categories`, {categories, newCategory, errorMessages, updatedCategory, updateErrorMessages, deletedCategoryId, deleteErrorMessage});
   } catch (err) {
     next(err);
   }
@@ -191,8 +201,23 @@ mainRouter.post(`/categories/:id`, [privateRoute, upload.single(`upload`)], asyn
     await api.updateCategory(id, updatedCategory);
     return res.redirect(`/categories`);
   } catch (error) {
-    req.session.currentCategory = {...updatedCategory, id: Number(id)};
+    req.session.updatedCategory = {...updatedCategory, id: Number(id)};
     req.session.updateErrorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/categories`);
+  }
+});
+
+mainRouter.get(`/categories/:id`, privateRoute, async (req, res) => {
+
+  const {id} = req.params;
+
+  try {
+    await api.deleteCategory(id);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.deletedCategoryId = Number(id);
+    req.session.deleteErrorMessage = error.response.data.errorMessage;
 
     return res.redirect(`/categories`);
   }

@@ -38,6 +38,11 @@ Content-Type: application/json
 
 ###
 
+# Удаление категории
+DELETE http://localhost:3000/api/categories/12 HTTP/1.1
+
+###
+
 # Список объявлений по id категории
 GET http://localhost:3000/api/articles/category/1 HTTP/1.1
 

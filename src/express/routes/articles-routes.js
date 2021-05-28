@@ -65,7 +65,7 @@ articlesRouter.post(`/add`, [privateRoute, upload.single(`upload`)], async (req,
   };
 
   try {
-    await api.createArticle(articleData);
+    await api.createArticle(articleData, req.session.isAdmin);
     return res.redirect(`/my`);
   } catch (error) {
     req.session.article = articleData;

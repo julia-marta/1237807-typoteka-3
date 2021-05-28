@@ -60,9 +60,10 @@ class API {
     return this._load(`/search`, {params: {query}});
   }
 
-  createArticle(data) {
+  createArticle(data, isAdmin) {
     return this._load(`/articles`, {
       method: `POST`,
+      params: {isAdmin},
       data
     });
   }

@@ -18,6 +18,16 @@ GET http://localhost:3000/api/categories HTTP/1.1
 
 ###
 
+# Создание категории
+POST http://localhost:3000/api/categories HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Новая категория"
+}
+
+###
+
 # Список объявлений по id категории
 GET http://localhost:3000/api/articles/category/1 HTTP/1.1
 

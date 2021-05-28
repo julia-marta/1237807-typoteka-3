@@ -32,6 +32,11 @@ module.exports.Comment = {
   MAX_LENGTH: 1000,
 };
 
+module.exports.Category = {
+  MIN_LENGTH: 5,
+  MAX_LENGTH: 30,
+};
+
 module.exports.MAX_TEXT_LENGTH = 1000;
 
 module.exports.MIN_CATEGORIES_LENGTH = 1;
@@ -61,6 +66,12 @@ module.exports.CommentMessage = {
   REQUIRED: `Сообщение не может быть пустым, напишите что-нибудь!`,
   MIN_TEXT_LENGTH: `Текст комментария должен быть не меньше 20 символов`,
   MAX_TEXT_LENGTH: `Текст объявления должен быть не больше 1000 символов`,
+};
+
+module.exports.CategoryMessage = {
+  REQUIRED: `Введите название категории`,
+  MIN_TEXT_LENGTH: `Название категории должно быть не меньше 5 символов`,
+  MAX_TEXT_LENGTH: `Название категории должно быть не больше 30 символов`,
 };
 
 module.exports.UserMessage = {

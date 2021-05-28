@@ -145,12 +145,35 @@ mainRouter.get(`/search`, wrapper, async (req, res) => {
 });
 
 mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
+
+  const {category = null, errorMessages = null} = req.session;
+
   try {
     const categories = await api.getCategories();
-
-    res.render(`all-categories`, {categories});
+    req.session.category = null;
+    req.session.errorMessages = null;
+    res.render(`all-categories`, {categories, category, errorMessages});
   } catch (err) {
     next(err);
+  }
+});
+
+mainRouter.post(`/categories`, [privateRoute, upload.single(`upload`)], async (req, res) => {
+
+  const {body} = req;
+
+  const newCategory = {
+    name: body[`add-category`],
+  };
+
+  try {
+    await api.createCategory(newCategory);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.category = newCategory;
+    req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/categories`);
   }
 });
 

@@ -101,6 +101,13 @@ class API {
     });
   }
 
+  createCategory(data) {
+    return this._load(`/categories`, {
+      method: `POST`,
+      data
+    });
+  }
+
   loginUser(data) {
     return this._load(`/user/login`, {
       method: `POST`,

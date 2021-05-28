@@ -33,7 +33,16 @@ class CategoryService {
   }
 
   findAll() {
-    return this._Category.findAll({raw: true});
+    return this._Category.findAll({
+      raw: true,
+      order: [[`createdAt`, `DESC`]]
+    });
+  }
+
+  async add(newCategory) {
+    const category = await this._Category.create(newCategory);
+
+    return category.get();
   }
 }
 

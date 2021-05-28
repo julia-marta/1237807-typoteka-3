@@ -50,7 +50,8 @@ class ArticleService {
       limit,
       offset,
       include: tables,
-      distinct: true
+      distinct: true,
+      order: [[`date`, `DESC`]]
     });
 
     return {count, articles: rows};
@@ -68,7 +69,7 @@ class ArticleService {
         where: {CategoryId: categoryId}
       }],
       distinct: true,
-      order: [[`createdAt`, `DESC`]]
+      order: [[`date`, `DESC`]]
     });
 
     return {count, articles: rows.map((item) => item.get())};
@@ -84,7 +85,7 @@ class ArticleService {
         require: true,
         where: {CategoryId: categoryId}
       }],
-      order: [[`createdAt`, `DESC`]]
+      order: [[`date`, `DESC`]]
     });
 
     return articles.map((offer) => offer.get());

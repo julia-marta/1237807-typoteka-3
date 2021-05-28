@@ -146,13 +146,15 @@ mainRouter.get(`/search`, wrapper, async (req, res) => {
 
 mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
 
-  const {category = null, errorMessages = null} = req.session;
+  const {newCategory = null, errorMessages = null, currentCategory = null, updateErrorMessages = null} = req.session;
 
   try {
     const categories = await api.getCategories();
     req.session.category = null;
     req.session.errorMessages = null;
-    res.render(`all-categories`, {categories, category, errorMessages});
+    req.session.currentCategory = null;
+    req.session.updateErrorMessages = null;
+    res.render(`all-categories`, {categories, newCategory, errorMessages, currentCategory, updateErrorMessages});
   } catch (err) {
     next(err);
   }
@@ -170,8 +172,27 @@ mainRouter.post(`/categories`, [privateRoute, upload.single(`upload`)], async (r
     await api.createCategory(newCategory);
     return res.redirect(`/categories`);
   } catch (error) {
-    req.session.category = newCategory;
+    req.session.newCategory = newCategory;
     req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/categories`);
+  }
+});
+
+mainRouter.post(`/categories/:id`, [privateRoute, upload.single(`upload`)], async (req, res) => {
+  const {id} = req.params;
+  const {body} = req;
+
+  const updatedCategory = {
+    name: body[`category-${id}`],
+  };
+
+  try {
+    await api.updateCategory(id, updatedCategory);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.currentCategory = {...updatedCategory, id: Number(id)};
+    req.session.updateErrorMessages = error.response.data.errorMessages;
 
     return res.redirect(`/categories`);
   }

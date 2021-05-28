@@ -108,6 +108,13 @@ class API {
     });
   }
 
+  updateCategory(id, data) {
+    return this._load(`/categories/${id}`, {
+      method: `PUT`,
+      data
+    });
+  }
+
   loginUser(data) {
     return this._load(`/user/login`, {
       method: `POST`,

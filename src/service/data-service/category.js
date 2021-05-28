@@ -44,6 +44,14 @@ class CategoryService {
 
     return category.get();
   }
+
+  async update(id, newCategory) {
+    const [affectedRows] = await this._Category.update(newCategory, {
+      where: {id}
+    });
+
+    return !!affectedRows;
+  }
 }
 
 module.exports = CategoryService;

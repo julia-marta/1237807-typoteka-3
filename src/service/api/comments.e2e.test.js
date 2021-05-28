@@ -138,7 +138,7 @@ describe(`API correctly deletes a comment`, () => {
 
   beforeAll(async () => {
     app = await createAPI();
-    response = await request(app).delete(`/articles/1/comments/2`);
+    response = await request(app).delete(`/articles/1/comments/2`).query({isAdmin: true});
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
@@ -158,13 +158,18 @@ describe(`API refuses to delete a comment`, () => {
 
   test(`When trying to delete non-existent comment response code is 404`, () => {
 
-    return request(app).delete(`/articles/1/comments/30`)
+    return request(app).delete(`/articles/1/comments/30`).query({isAdmin: true})
       .expect(HttpCode.NOT_FOUND);
   });
 
   test(`When trying to delete a comment to non-existent post response code is 404`, () => {
 
-    return request(app).delete(`/articles/NOEXIST/comments/1`)
+    return request(app).delete(`/articles/NOEXIST/comments/1`).query({isAdmin: true})
       .expect(HttpCode.NOT_FOUND);
+  });
+
+  test(`When trying to delete a comment not by admin response code is 403`, () => {
+
+    return request(app).delete(`/articles/1/comments/30`).expect(HttpCode.FORBIDDEN);
   });
 });

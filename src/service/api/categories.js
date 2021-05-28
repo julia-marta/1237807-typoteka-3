@@ -5,6 +5,7 @@ const {HttpCode} = require(`../../const`);
 const categoryExists = require(`../middlewares/category-exists`);
 const categoryUniqueName = require(`../middlewares/category-unique-name`);
 const categoryHasArticles = require(`../middlewares/category-has-articles`);
+const userAdmin = require(`../middlewares/user-admin`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const categorySchema = require(`../schemas/category`);
 
@@ -19,6 +20,7 @@ module.exports = (serviceLocator) => {
   const isCategoryNameUnique = categoryUniqueName(service, logger);
   const isCategoryHasArticles = categoryHasArticles(service, logger);
   const isCategoryValid = schemaValidator(categorySchema, logger);
+  const isUserAdmin = userAdmin(logger);
 
   app.use(`/categories`, route);
 
@@ -43,13 +45,13 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(category);
   });
 
-  route.post(`/`, [isCategoryValid, isCategoryNameUnique], async (req, res) => {
+  route.post(`/`, [isUserAdmin, isCategoryValid, isCategoryNameUnique], async (req, res) => {
     const category = await service.add(req.body);
 
     return res.status(HttpCode.CREATED).json(category);
   });
 
-  route.put(`/:categoryId`, [isCategoryExists, isCategoryValid, isCategoryNameUnique], async (req, res) => {
+  route.put(`/:categoryId`, [isUserAdmin, isCategoryExists, isCategoryValid, isCategoryNameUnique], async (req, res) => {
     const {categoryId} = req.params;
 
     await service.update(categoryId, req.body);
@@ -57,7 +59,7 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).send(`Category was updated`);
   });
 
-  route.delete(`/:categoryId`, [isCategoryExists, isCategoryHasArticles], async (req, res) => {
+  route.delete(`/:categoryId`, [isUserAdmin, isCategoryExists, isCategoryHasArticles], async (req, res) => {
     const {categoryId} = req.params;
 
     await service.delete(categoryId);

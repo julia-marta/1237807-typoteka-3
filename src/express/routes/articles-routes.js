@@ -115,13 +115,25 @@ articlesRouter.post(`/edit/:id`, [privateRoute, upload.single(`upload`)], async 
   };
 
   try {
-    await api.updateArticle(id, newData);
+    await api.updateArticle(id, newData, req.session.isAdmin);
     return res.redirect(`/my`);
   } catch (error) {
     req.session.newData = newData;
     req.session.errorMessages = error.response.data.errorMessages;
 
     return res.redirect(`/articles/edit/${id}`);
+  }
+});
+
+articlesRouter.get(`/delete/:id`, privateRoute, async (req, res, next) => {
+
+  const {id} = req.params;
+
+  try {
+    await api.deleteArticle(id, req.session.isAdmin);
+    res.redirect(`back`);
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -162,6 +174,18 @@ articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, 
   } catch (error) {
     req.session.errorMessages = error.response.data.errorMessages;
     return res.redirect(`back`);
+  }
+});
+
+articlesRouter.get(`/:id/comments/:commentId`, privateRoute, async (req, res, next) => {
+
+  const {id, commentId} = req.params;
+
+  try {
+    await api.deleteComment(id, commentId, req.session.isAdmin);
+    res.redirect(`back`);
+  } catch (err) {
+    next(err);
   }
 });
 

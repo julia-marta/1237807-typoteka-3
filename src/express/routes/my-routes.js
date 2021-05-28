@@ -28,28 +28,4 @@ myRouter.get(`/comments`, [wrapper, privateRoute], async (req, res, next) => {
   }
 });
 
-myRouter.get(`/:articleId`, privateRoute, async (req, res, next) => {
-
-  const {articleId} = req.params;
-
-  try {
-    await api.deleteArticle(articleId);
-    res.redirect(`back`);
-  } catch (err) {
-    next(err);
-  }
-});
-
-myRouter.get(`/comments/:articleId/:id`, privateRoute, async (req, res, next) => {
-
-  const {articleId, id} = req.params;
-
-  try {
-    await api.deleteComment(id, articleId);
-    res.redirect(`back`);
-  } catch (err) {
-    next(err);
-  }
-});
-
 module.exports = myRouter;

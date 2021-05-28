@@ -179,7 +179,7 @@ mainRouter.post(`/categories`, [privateRoute, upload.single(`upload`)], async (r
   };
 
   try {
-    await api.createCategory(newCategory);
+    await api.createCategory(newCategory, req.session.isAdmin);
     return res.redirect(`/categories`);
   } catch (error) {
     req.session.newCategory = newCategory;
@@ -198,7 +198,7 @@ mainRouter.post(`/categories/:id`, [privateRoute, upload.single(`upload`)], asyn
   };
 
   try {
-    await api.updateCategory(id, updatedCategory);
+    await api.updateCategory(id, updatedCategory, req.session.isAdmin);
     return res.redirect(`/categories`);
   } catch (error) {
     req.session.updatedCategory = {...updatedCategory, id: Number(id)};
@@ -213,7 +213,7 @@ mainRouter.get(`/categories/:id`, privateRoute, async (req, res) => {
   const {id} = req.params;
 
   try {
-    await api.deleteCategory(id);
+    await api.deleteCategory(id, req.session.isAdmin);
     return res.redirect(`/categories`);
   } catch (error) {
     req.session.deletedCategoryId = Number(id);

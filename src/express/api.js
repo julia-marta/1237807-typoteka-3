@@ -68,16 +68,18 @@ class API {
     });
   }
 
-  updateArticle(id, data) {
+  updateArticle(id, data, isAdmin) {
     return this._load(`/articles/${id}`, {
       method: `PUT`,
+      params: {isAdmin},
       data
     });
   }
 
-  deleteArticle(articleId) {
-    return this._load(`/articles/${articleId}`, {
+  deleteArticle(id, isAdmin) {
+    return this._load(`/articles/${id}`, {
       method: `DELETE`,
+      params: {isAdmin},
     });
   }
 
@@ -89,9 +91,10 @@ class API {
     });
   }
 
-  deleteComment(id, articleId) {
-    return this._load(`/articles/${articleId}/comments/${id}`, {
-      method: `DELETE`
+  deleteComment(id, commentId, isAdmin) {
+    return this._load(`/articles/${id}/comments/${commentId}`, {
+      method: `DELETE`,
+      params: {isAdmin},
     });
   }
 
@@ -102,23 +105,26 @@ class API {
     });
   }
 
-  createCategory(data) {
+  createCategory(data, isAdmin) {
     return this._load(`/categories`, {
       method: `POST`,
+      params: {isAdmin},
       data
     });
   }
 
-  updateCategory(id, data) {
+  updateCategory(id, data, isAdmin) {
     return this._load(`/categories/${id}`, {
       method: `PUT`,
+      params: {isAdmin},
       data
     });
   }
 
-  deleteCategory(id) {
+  deleteCategory(id, isAdmin) {
     return this._load(`/categories/${id}`, {
       method: `DELETE`,
+      params: {isAdmin},
     });
   }
 

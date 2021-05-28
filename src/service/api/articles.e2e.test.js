@@ -13,7 +13,6 @@ const {getLogger} = require(`../lib/test-logger`);
 const {mockArticles, mockCategories, mockUsers, mockComments, mockPost} = require(`./articles.test-data`);
 const {HttpCode, ArticleMessage} = require(`../../const`);
 
-
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
   await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers, comments: mockComments});
@@ -217,7 +216,7 @@ describe(`API refuses to create a post`, () => {
 
   describe(`With title length less than min value`, () => {
     const badPost = {...newPost};
-    badPost .title = `Тест`;
+    badPost.title = `Тест`;
     let response;
 
     beforeAll(async () => {
@@ -320,7 +319,7 @@ describe(`API correctly deletes a post`, () => {
   );
 });
 
-describe(`API refuses to delete non-existent post`, () => {
+describe(`API refuses to delete post`, () => {
 
   let app;
 

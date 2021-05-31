@@ -13,7 +13,6 @@ const {getLogger} = require(`../lib/test-logger`);
 const {mockArticles, mockCategories, mockUsers, mockComments, mockPost} = require(`./articles.test-data`);
 const {HttpCode, ArticleMessage} = require(`../../const`);
 
-
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
   await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers, comments: mockComments});
@@ -45,6 +44,20 @@ describe(`API returns a list of all articles`, () => {
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
   test(`Returns a list of 4 posts`, () => expect(response.body.length).toBe(4));
   test(`Second post's image equals "sea@1x.jpg"`, () => expect(response.body[1].image).toBe(`sea@1x.jpg`));
+});
+
+describe(`API returns a list of all articles in category`, () => {
+
+  let response;
+
+  beforeAll(async () => {
+    const app = await createAPI();
+    response = await request(app).get(`/articles/category/10`);
+  });
+
+  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+  test(`Returns a list of 2 posts`, () => expect(response.body.length).toBe(2));
+  test(`First post's title equals "Лучшие рок-музыканты 20-века"`, () => expect(response.body[0].title).toBe(`Лучшие рок-музыканты 20-века`));
 });
 
 describe(`API returns a post with given id`, () => {
@@ -79,7 +92,7 @@ describe(`API creates a post if data is valid`, () => {
 
   beforeAll(async () => {
     app = await createAPI();
-    response = await request(app).post(`/articles`).send(newPost);
+    response = await request(app).post(`/articles`).query({isAdmin: true}).send(newPost);
   });
 
 
@@ -91,7 +104,7 @@ describe(`API creates a post if data is valid`, () => {
   );
 });
 
-describe(`API refuses to create a post if data is invalid`, () => {
+describe(`API refuses to create a post`, () => {
 
   const newPost = JSON.parse(JSON.stringify(mockPost));
 
@@ -106,7 +119,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     const badPost = {...newPost};
     badPost.excess = `excess value`;
 
-    await request(app).post(`/articles`).send(badPost)
+    await request(app).post(`/articles`).query({isAdmin: true}).send(badPost)
       .expect(HttpCode.BAD_REQUEST);
   });
 
@@ -116,7 +129,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -129,7 +142,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -142,7 +155,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -155,7 +168,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -168,7 +181,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -181,7 +194,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -194,7 +207,7 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -203,11 +216,11 @@ describe(`API refuses to create a post if data is invalid`, () => {
 
   describe(`With title length less than min value`, () => {
     const badPost = {...newPost};
-    badPost .title = `Тест`;
+    badPost.title = `Тест`;
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
@@ -220,11 +233,17 @@ describe(`API refuses to create a post if data is invalid`, () => {
     let response;
 
     beforeAll(async () => {
-      response = await request(app).post(`/articles`).send(badPost);
+      response = await request(app).post(`/articles`).query({isAdmin: true}).send(badPost);
     });
 
     test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
     test(`Returns valid error message`, () => expect(response.text).toMatch(ArticleMessage.MIN_ANNOUNCE_LENGTH));
+  });
+
+  test(`When trying to create a post not by admin response code is 403`, () => {
+
+    return request(app).post(`/articles`).send(newPost)
+      .expect(HttpCode.FORBIDDEN);
   });
 });
 
@@ -237,7 +256,7 @@ describe(`API changes existent post`, () => {
 
   beforeAll(async () => {
     app = await createAPI();
-    response = await request(app).put(`/articles/4`).send(newPost);
+    response = await request(app).put(`/articles/4`).query({isAdmin: true}).send(newPost);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
@@ -262,7 +281,7 @@ describe(`API refuses to change post`, () => {
 
     const validPost = {...newPost};
 
-    return request(app).put(`/articles/NOEXIST`).send(validPost)
+    return request(app).put(`/articles/NOEXIST`).query({isAdmin: true}).send(validPost)
       .expect(HttpCode.NOT_FOUND);
   });
 
@@ -271,8 +290,14 @@ describe(`API refuses to change post`, () => {
     const invalidPost = {...newPost};
     delete invalidPost.announce;
 
-    return request(app).put(`/articles/4`).send(invalidPost)
+    return request(app).put(`/articles/4`).query({isAdmin: true}).send(invalidPost)
       .expect(HttpCode.BAD_REQUEST);
+  });
+
+  test(`When trying to change a post not by admin response code is 403`, () => {
+
+    return request(app).put(`/articles/4`).send(newPost)
+      .expect(HttpCode.FORBIDDEN);
   });
 });
 
@@ -283,7 +308,7 @@ describe(`API correctly deletes a post`, () => {
 
   beforeAll(async () => {
     app = await createAPI();
-    response = await request(app).delete(`/articles/3`);
+    response = await request(app).delete(`/articles/3`).query({isAdmin: true});
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
@@ -294,12 +319,23 @@ describe(`API correctly deletes a post`, () => {
   );
 });
 
-describe(`API refuses to delete non-existent post`, () => {
+describe(`API refuses to delete post`, () => {
+
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
 
   test(`When trying to delete non-existent post response code is 404`, async () => {
-    const app = await createAPI();
 
-    return request(app).delete(`/articles/NOEXIST`)
+    return request(app).delete(`/articles/NOEXIST`).query({isAdmin: true})
     .expect(HttpCode.NOT_FOUND);
+  });
+
+  test(`When trying to delete a post not by admin response code is 403`, () => {
+
+    return request(app).delete(`/articles/4`).expect(HttpCode.FORBIDDEN);
   });
 });

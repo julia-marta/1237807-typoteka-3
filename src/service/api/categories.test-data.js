@@ -7,7 +7,8 @@ module.exports.mockCategories = [
   `Без рамки`,
   `IT`,
   `Программирование`,
-  `Путешествия`
+  `Путешествия`,
+  `Категория без статей`
 ];
 
 module.exports.mockArticles = [
@@ -46,6 +47,10 @@ module.exports.mockArticles = [
     image: `forest@1x.jpg`,
   }
 ];
+
+module.exports.mockCategory = {
+  name: `Новая категория`
+};
 
 module.exports.mockUsers = [
   {

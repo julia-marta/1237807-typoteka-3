@@ -5,11 +5,37 @@ const apiFactory = require(`../api`);
 const {upload} = require(`../middlewares/multer`);
 const privateRoute = require(`../middlewares/private-route`);
 const loggedRoute = require(`../middlewares/logged-route`);
-const articlesRouter = new Router();
+const {getPagerRange} = require(`../../utils`);
+const {ARTICLES_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
 
+const articlesRouter = new Router();
 const api = apiFactory.getAPI();
 
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles/articles-by-category`));
+articlesRouter.get(`/category/:id`, async (req, res, next) => {
+  const {id} = req.params;
+  let {page = 1} = req.query;
+  page = +page;
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  try {
+    const [{count, articles}, currentCategory, categories] = await Promise.all([
+      api.getArticlesByCategory(id, {limit, offset}),
+      api.getCategory(id),
+      api.getCategories({count: true})
+    ]);
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+    const range = getPagerRange(page, totalPages, PAGER_WIDTH);
+    const withPagination = totalPages > 1;
+
+    res.render(`articles/articles-by-category`, {currentCategory, count, articles, categories, page, totalPages, range, withPagination});
+  } catch (err) {
+
+    next(err);
+  }
+
+});
 
 articlesRouter.get(`/add`, privateRoute, async (req, res, next) => {
 
@@ -39,7 +65,7 @@ articlesRouter.post(`/add`, [privateRoute, upload.single(`upload`)], async (req,
   };
 
   try {
-    await api.createArticle(articleData);
+    await api.createArticle(articleData, req.session.isAdmin);
     return res.redirect(`/my`);
   } catch (error) {
     req.session.article = articleData;
@@ -89,13 +115,25 @@ articlesRouter.post(`/edit/:id`, [privateRoute, upload.single(`upload`)], async 
   };
 
   try {
-    await api.updateArticle(id, newData);
+    await api.updateArticle(id, newData, req.session.isAdmin);
     return res.redirect(`/my`);
   } catch (error) {
     req.session.newData = newData;
     req.session.errorMessages = error.response.data.errorMessages;
 
     return res.redirect(`/articles/edit/${id}`);
+  }
+});
+
+articlesRouter.get(`/delete/:id`, privateRoute, async (req, res, next) => {
+
+  const {id} = req.params;
+
+  try {
+    await api.deleteArticle(id, req.session.isAdmin);
+    res.redirect(`back`);
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -136,6 +174,18 @@ articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, 
   } catch (error) {
     req.session.errorMessages = error.response.data.errorMessages;
     return res.redirect(`back`);
+  }
+});
+
+articlesRouter.get(`/:id/comments/:commentId`, privateRoute, async (req, res, next) => {
+
+  const {id, commentId} = req.params;
+
+  try {
+    await api.deleteComment(id, commentId, req.session.isAdmin);
+    res.redirect(`back`);
+  } catch (err) {
+    next(err);
   }
 });
 

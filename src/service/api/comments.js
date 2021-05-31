@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
 const articleExists = require(`../middlewares/article-exists`);
+const userAdmin = require(`../middlewares/user-admin`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const commentSchema = require(`../schemas/comment`);
 
@@ -16,12 +17,21 @@ module.exports = (serviceLocator) => {
 
   const isPostExists = articleExists(articleService, logger);
   const isCommentValid = schemaValidator(commentSchema, logger);
+  const isUserAdmin = userAdmin(logger);
 
   app.use(`/`, route);
 
   route.get(`/allcomments`, async (req, res) => {
 
     const comments = await commentService.findAll();
+
+    return res.status(HttpCode.OK).json(comments);
+  });
+
+  route.get(`/lastcomments`, async (req, res) => {
+    const {limit} = req.query;
+
+    const comments = await commentService.findLast(limit);
 
     return res.status(HttpCode.OK).json(comments);
   });
@@ -34,7 +44,7 @@ module.exports = (serviceLocator) => {
     return res.status(HttpCode.OK).json(comments);
   });
 
-  route.delete(`/articles/:articleId/comments/:commentId`, isPostExists, async (req, res) => {
+  route.delete(`/articles/:articleId/comments/:commentId`, [isUserAdmin, isPostExists], async (req, res) => {
     const {commentId} = req.params;
 
     const deleted = await commentService.delete(commentId);

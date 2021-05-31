@@ -8,6 +8,6 @@ block content
         each article in articles
           li.notes__list-item
             +date(article.date)(class=`notes__item-time`)
-            a.notes__item-text(href=`/articles/${article.id}`) #{article.title}
-            a.notes__button.button.button--close-item(href=`/my/${article.id}`)
+            a.notes__item-text(href=`/articles/edit/${article.id}`) #{article.title}
+            a.notes__button.button.button--close-item(href=`/articles/delete/${article.id}`)
               span.visually-hidden Закрыть строку списка

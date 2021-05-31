@@ -1,5 +1,5 @@
 'use strict';
-
+const Sequelize = require(`sequelize`);
 const Aliase = require(`../models/aliase`);
 
 class ArticleService {
@@ -7,19 +7,7 @@ class ArticleService {
     this._Article = sequelize.models.Article;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
-  }
-
-  async add(articleData) {
-    const article = await this._Article.create(articleData);
-    await article.addCategories(articleData.categories);
-    return article.get();
-  }
-
-  async delete(id) {
-    const deletedRows = await this._Article.destroy({
-      where: {id}
-    });
-    return !!deletedRows;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async findAll(withComments) {
@@ -62,10 +50,79 @@ class ArticleService {
       limit,
       offset,
       include: tables,
-      distinct: true
+      distinct: true,
+      order: [[`date`, `DESC`]]
     });
 
     return {count, articles: rows};
+  }
+
+  async findPageByCategory({limit, offset, categoryId}) {
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include: [Aliase.CATEGORIES, Aliase.COMMENTS, {
+        model: this._ArticleCategory,
+        as: Aliase.ARTICLE_CATEGORIES,
+        attributes: [],
+        require: true,
+        where: {CategoryId: categoryId}
+      }],
+      distinct: true,
+      order: [[`date`, `DESC`]]
+    });
+
+    return {count, articles: rows.map((item) => item.get())};
+  }
+
+  async findAllByCategory(categoryId) {
+
+    const articles = await this._Article.findAll({
+      include: [Aliase.CATEGORIES, Aliase.COMMENTS, {
+        model: this._ArticleCategory,
+        as: Aliase.ARTICLE_CATEGORIES,
+        attributes: [],
+        require: true,
+        where: {CategoryId: categoryId}
+      }],
+      order: [[`date`, `DESC`]]
+    });
+
+    return articles.map((offer) => offer.get());
+  }
+
+  async findPopular(limit) {
+    const articles = await this._Article.findAll({
+      limit,
+      attributes: {
+        include: [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `count`]
+      },
+      include: [
+        {
+          model: this._Comment,
+          as: Aliase.COMMENTS,
+          attributes: [],
+          duplicating: false,
+        }
+      ],
+      group: [`Article.id`],
+      order: [[`count`, `DESC`]],
+    });
+
+    return articles.map((offer) => offer.get());
+  }
+
+  async add(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.categories);
+    return article.get();
+  }
+
+  async delete(id) {
+    const deletedRows = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
   }
 
   async update(id, articleData) {

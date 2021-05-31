@@ -7,11 +7,11 @@ const {upload} = require(`../middlewares/multer`);
 const wrapper = require(`../middlewares/wrapper`);
 const privateRoute = require(`../middlewares/private-route`);
 const {getPagerRange} = require(`../../utils`);
+const {ARTICLES_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
+
+const TOP_PER_PAGE = 4;
+
 const mainRouter = new Router();
-
-const ARTICLES_PER_PAGE = 8;
-const PAGER_WIDTH = 2;
-
 const api = apiFactory.getAPI();
 
 const csrfProtection = csrf({
@@ -25,19 +25,22 @@ mainRouter.get(`/`, async (req, res, next) => {
   let {page = 1} = req.query;
   page = +page;
   const limit = ARTICLES_PER_PAGE;
+  const topLimit = TOP_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
 
   try {
-    const [{count, articles}, categories] = await Promise.all([
+    const [{count, articles}, popularArticles, categories, lastComments] = await Promise.all([
       api.getArticles({limit, offset, comments: true}),
-      api.getCategories({count: true})
+      api.getPopularArticles({limit: topLimit}),
+      api.getCategories({count: true}),
+      api.getLastComments({limit: topLimit})
     ]);
 
     const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
     const range = getPagerRange(page, totalPages, PAGER_WIDTH);
     const withPagination = totalPages > 1;
 
-    res.render(`main`, {articles, categories, page, totalPages, range, withPagination});
+    res.render(`main`, {articles, popularArticles, categories, lastComments, page, totalPages, range, withPagination});
   } catch (err) {
     next(err);
   }
@@ -142,12 +145,81 @@ mainRouter.get(`/search`, wrapper, async (req, res) => {
 });
 
 mainRouter.get(`/categories`, [wrapper, privateRoute], async (req, res, next) => {
+
+  const {
+    newCategory = null,
+    errorMessages = null,
+    updatedCategory = null,
+    updateErrorMessages = null,
+    deletedCategoryId = null,
+    deleteErrorMessage = null,
+  } = req.session;
+
   try {
     const categories = await api.getCategories();
+    req.session.newCategory = null;
+    req.session.errorMessages = null;
+    req.session.updatedCategory = null;
+    req.session.updateErrorMessages = null;
+    req.session.deletedCategoryId = null;
+    req.session.deleteErrorMessage = null;
 
-    res.render(`all-categories`, {categories});
+    res.render(`all-categories`, {categories, newCategory, errorMessages, updatedCategory, updateErrorMessages, deletedCategoryId, deleteErrorMessage});
   } catch (err) {
     next(err);
+  }
+});
+
+mainRouter.post(`/categories`, [privateRoute, upload.single(`upload`)], async (req, res) => {
+
+  const {body} = req;
+
+  const newCategory = {
+    name: body[`add-category`],
+  };
+
+  try {
+    await api.createCategory(newCategory, req.session.isAdmin);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.newCategory = newCategory;
+    req.session.errorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/categories`);
+  }
+});
+
+mainRouter.post(`/categories/:id`, [privateRoute, upload.single(`upload`)], async (req, res) => {
+  const {id} = req.params;
+  const {body} = req;
+
+  const updatedCategory = {
+    name: body[`category-${id}`],
+  };
+
+  try {
+    await api.updateCategory(id, updatedCategory, req.session.isAdmin);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.updatedCategory = {...updatedCategory, id: Number(id)};
+    req.session.updateErrorMessages = error.response.data.errorMessages;
+
+    return res.redirect(`/categories`);
+  }
+});
+
+mainRouter.get(`/categories/:id`, privateRoute, async (req, res) => {
+
+  const {id} = req.params;
+
+  try {
+    await api.deleteCategory(id, req.session.isAdmin);
+    return res.redirect(`/categories`);
+  } catch (error) {
+    req.session.deletedCategoryId = Number(id);
+    req.session.deleteErrorMessage = error.response.data.errorMessage;
+
+    return res.redirect(`/categories`);
   }
 });
 

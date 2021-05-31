@@ -1,10 +1,11 @@
 mixin themes(categories)
   ul.themes(class!=attributes.class || ``)
     each category in categories
-      li.themes__item
-        a.themes__item-link(href="#")
-          | #{category.name} 
-          sup #{category.count}
+      if (category.count !== `0`)
+        li.themes__item
+          a(class=`themes__item-link ${currentCategory ? (currentCategory.id === category.id ? `themes__item-link--active` : ``)  : ``}`, href=`/articles/category/${category.id}`)
+            | #{category.name} 
+            sup #{category.count}
 
         if attributes.class
           button.themes__remove-btn(type="button") Удалить категорию

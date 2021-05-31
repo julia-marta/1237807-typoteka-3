@@ -34,6 +34,7 @@ const defineRelations = ({Comment, Category, ArticleCategory}) => {
 
   Article.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `articleId`});
   Article.belongsToMany(Category, {through: ArticleCategory, as: Aliase.CATEGORIES});
+  Article.hasMany(ArticleCategory, {as: Aliase.ARTICLE_CATEGORIES});
 };
 
 module.exports = {define, defineRelations};

@@ -28,8 +28,44 @@ class CategoryService {
     return result.map((it) => it.get());
   }
 
-  async findAll() {
-    return this._Category.findAll({raw: true});
+  findOne(id) {
+    return this._Category.findByPk(id);
+  }
+
+  findAll() {
+    return this._Category.findAll({
+      raw: true,
+      order: [[`createdAt`, `DESC`]]
+    });
+  }
+
+  findAllWithArticles(categoryId) {
+
+    return this._ArticleCategory.findAll({
+      raw: true,
+      where: {CategoryId: categoryId}
+    });
+  }
+
+  async add(newCategory) {
+    const category = await this._Category.create(newCategory);
+
+    return category.get();
+  }
+
+  async update(id, newCategory) {
+    const [affectedRows] = await this._Category.update(newCategory, {
+      where: {id}
+    });
+
+    return !!affectedRows;
+  }
+
+  async delete(id) {
+    const deletedRows = await this._Category.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
   }
 }
 

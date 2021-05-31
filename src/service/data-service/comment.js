@@ -24,6 +24,16 @@ class CommentService {
     });
   }
 
+  async findLast(limit) {
+    const comments = await this._Comment.findAll({
+      limit,
+      include: [Aliase.USERS],
+      order: [[`createdAt`, `DESC`]]
+    });
+
+    return comments.map((comment) => comment.get());
+  }
+
   async create(articleId, userId, comment) {
     const newComment = await this._Comment.create({
       articleId,

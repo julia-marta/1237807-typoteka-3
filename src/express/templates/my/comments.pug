@@ -13,5 +13,5 @@ block content
               +date(comment.createdAt)(class=`publication__item-time`)
             a.publication__item-text(href="#") #{comment.text}
             p.publication__text-strong #{comment.articles.title}
-            a.publication__button.button.button--close-item(href=`/my/comments/${comment.articles.id}/${comment.id}`)
+            a.publication__button.button.button--close-item(href=`/articles/${comment.articles.id}/comments/${comment.id}`)
               span.visually-hidden Закрыть строку списка

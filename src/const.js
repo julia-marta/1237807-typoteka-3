@@ -32,6 +32,11 @@ module.exports.Comment = {
   MAX_LENGTH: 1000,
 };
 
+module.exports.Category = {
+  MIN_LENGTH: 5,
+  MAX_LENGTH: 30,
+};
+
 module.exports.MAX_TEXT_LENGTH = 1000;
 
 module.exports.MIN_CATEGORIES_LENGTH = 1;
@@ -63,6 +68,14 @@ module.exports.CommentMessage = {
   MAX_TEXT_LENGTH: `Текст объявления должен быть не больше 1000 символов`,
 };
 
+module.exports.CategoryMessage = {
+  REQUIRED: `Введите название категории`,
+  MIN_TEXT_LENGTH: `Название категории должно быть не меньше 5 символов`,
+  MAX_TEXT_LENGTH: `Название категории должно быть не больше 30 символов`,
+  HAS_ARTICLES: `Вы не можете удалить категорию, в которой уже есть статьи`,
+  NAME_ALREADY_EXISTS: `Категория с таким названием уже существует`
+};
+
 module.exports.UserMessage = {
 
   REQUIRED: {
@@ -92,6 +105,10 @@ module.exports.LoginMessage = {
   EMAIL_NOT_REGISTERED: `Пользователь с таким электронным адресом не зарегистрирован`,
   WRONG_PASSWORD: `Неверный пароль`
 };
+
+module.exports.ARTICLES_PER_PAGE = 8;
+
+module.exports.PAGER_WIDTH = 2;
 
 module.exports.API_PREFIX = `/api`;
 

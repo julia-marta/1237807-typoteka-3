@@ -5,17 +5,25 @@ block content
     section.main-page__category.category
       h1.category__title Категории
       .category__add-form
-        form(action="#", method="POST")
-          input#add-form-add-category(type="text", name="add-category", placeholder="Новая категория")
+        form(action="/categories", method="POST", enctype="multipart/form-data")
+          input#add-form-add-category(type="text", name="add-category", placeholder="Новая категория", value=(newCategory ? newCategory.name : ``))
           label(for="add-form-add-category")
             span.visually-hidden Добавить категорию
           button.category__button.button.button--category(type="submit") Добавить
+        if errorMessages
+          each error in errorMessages
+            p.form__error-message #{error}
       ul.category__list
         each category in categories
           li.category__list-item
-            form(action="#", method="POST")
-              input(id=`modify-form-category-${category.id}` type="text", name=`category-${category.id}`, value=category.name)
+            form(action=`/categories/${category.id}`, method="POST", enctype="multipart/form-data")
+              input(id=`modify-form-category-${category.id}` type="text", name=`category-${category.id}`, value=(updatedCategory && updatedCategory.id === category.id ? updatedCategory.name : category.name))
               label(for=`modify-form-category-${category.id}`)
                 span.visually-hidden Редактировать категорию
               button.category__button.button.button--category(type="submit") Сохранить
-              button.category__button.button.button--category(type="button") Удалить
+              a.category__button.button.button--category(href=`/categories/${category.id}`) Удалить
+            if updatedCategory && updatedCategory.id === category.id && updateErrorMessages
+              each error in updateErrorMessages
+                p.form__error-message #{error}
+            if deletedCategoryId && deletedCategoryId === category.id && deleteErrorMessage
+              p.form__error-message #{deleteErrorMessage}

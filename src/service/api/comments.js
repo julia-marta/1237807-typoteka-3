@@ -1,11 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
 const articleExists = require(`../middlewares/article-exists`);
 const userAdmin = require(`../middlewares/user-admin`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const commentSchema = require(`../schemas/comment`);
+const {HttpCode, TOP_PER_PAGE} = require(`../../const`);
 
 module.exports = (serviceLocator) => {
   const route = new Router({mergeParams: true});
@@ -14,6 +14,7 @@ module.exports = (serviceLocator) => {
   const articleService = serviceLocator.get(`articleService`);
   const commentService = serviceLocator.get(`commentService`);
   const logger = serviceLocator.get(`logger`);
+  const socketService = serviceLocator.get(`socketService`);
 
   const isPostExists = articleExists(articleService, logger);
   const isCommentValid = schemaValidator(commentSchema, logger);
@@ -54,6 +55,12 @@ module.exports = (serviceLocator) => {
       return logger.error(`Comment not found: ${commentId}`);
     }
 
+    const updatedComments = await commentService.findLast(TOP_PER_PAGE);
+    const updatedArticles = await articleService.findPopular(TOP_PER_PAGE);
+
+    socketService.emiter(`comments`, JSON.parse(JSON.stringify(updatedComments)));
+    socketService.emiter(`articles`, JSON.parse(JSON.stringify(updatedArticles)));
+
     return res.status(HttpCode.OK).send(`Comment was deleted`);
   });
 
@@ -62,6 +69,11 @@ module.exports = (serviceLocator) => {
     const {userId} = req.query;
 
     const comment = await commentService.create(post.id, userId, req.body);
+    const updatedComments = await commentService.findLast(TOP_PER_PAGE);
+    const updatedArticles = await articleService.findPopular(TOP_PER_PAGE);
+
+    socketService.emiter(`comments`, JSON.parse(JSON.stringify(updatedComments)));
+    socketService.emiter(`articles`, JSON.parse(JSON.stringify(updatedArticles)));
 
     return res.status(HttpCode.CREATED).json(comment);
   });

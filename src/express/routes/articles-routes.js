@@ -163,9 +163,6 @@ articlesRouter.post(`/:id`, [loggedRoute, upload.single(`upload`)], async (req, 
   const {id} = req.params;
   const userId = req.session.loggedUser.id;
   const {body} = req;
-  const {socket} = req;
-
-  socket.emit(`newcomment`, `Комментарий отправлен`);
 
   const commentData = {
     text: body.message

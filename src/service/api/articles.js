@@ -87,8 +87,7 @@ module.exports = (serviceLocator) => {
     const updatedComments = await commentService.findLast(TOP_PER_PAGE);
     const updatedArticles = await service.findPopular(TOP_PER_PAGE);
 
-    socketService.emiter(`comments`, JSON.parse(JSON.stringify(updatedComments)));
-    socketService.emiter(`articles`, JSON.parse(JSON.stringify(updatedArticles)));
+    socketService.updateTop(updatedComments, updatedArticles);
 
     return res.status(HttpCode.OK).send(`Post was deleted`);
   });

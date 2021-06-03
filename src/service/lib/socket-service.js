@@ -32,6 +32,11 @@ class SocketService {
       this._io.emit(event, body);
     }
   }
+
+  updateTop(articles) {
+    // this._io.emit(`comments`, JSON.parse(JSON.stringify(comments)));
+    this._io.emit(`articles`, JSON.parse(JSON.stringify(articles)));
+  }
 }
 
 module.exports = SocketService;

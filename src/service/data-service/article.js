@@ -95,7 +95,7 @@ class ArticleService {
     const articles = await this._Article.findAll({
       limit,
       attributes: {
-        include: [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `count`]
+        include: [[Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `count`]]
       },
       include: [
         {
@@ -109,7 +109,7 @@ class ArticleService {
       order: [[`count`, `DESC`]],
     });
 
-    return articles.map((offer) => offer.get());
+    return articles.map((article) => article.get());
   }
 
   async add(articleData) {

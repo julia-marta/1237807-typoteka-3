@@ -1,11 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
 const articleExists = require(`../middlewares/article-exists`);
 const userAdmin = require(`../middlewares/user-admin`);
 const schemaValidator = require(`../middlewares/schema-validator`);
 const articleSchema = require(`../schemas/article`);
+const {HttpCode, TOP_PER_PAGE} = require(`../../const`);
 
 module.exports = (serviceLocator) => {
   const route = new Router();
@@ -15,6 +15,7 @@ module.exports = (serviceLocator) => {
   const categoryService = serviceLocator.get(`categoryService`);
   const commentService = serviceLocator.get(`commentService`);
   const logger = serviceLocator.get(`logger`);
+  const socketService = serviceLocator.get(`socketService`);
 
   const isPostExists = articleExists(service, logger);
   const isPostValid = schemaValidator(articleSchema, logger, categoryService);
@@ -82,6 +83,11 @@ module.exports = (serviceLocator) => {
 
     await commentService.deleteAllByArticle(articleId);
     await service.delete(articleId);
+
+    const updatedComments = await commentService.findLast(TOP_PER_PAGE);
+    const updatedArticles = await service.findPopular(TOP_PER_PAGE);
+
+    socketService.updateTop(updatedComments, updatedArticles);
 
     return res.status(HttpCode.OK).send(`Post was deleted`);
   });

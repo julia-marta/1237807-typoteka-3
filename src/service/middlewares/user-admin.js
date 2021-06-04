@@ -2,7 +2,7 @@
 
 const {HttpCode} = require(`../../const`);
 
-module.exports = (logger) => async (req, res, next) => {
+module.exports = (logger) => (req, res, next) => {
 
   const {isAdmin} = req.query;
 

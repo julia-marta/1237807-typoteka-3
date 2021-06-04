@@ -16,7 +16,6 @@ const TEMPLATES_DIR = `templates`;
 
 const app = express();
 
-
 app.use(expressSession({
   secret: process.env.SECRET,
   resave: false,

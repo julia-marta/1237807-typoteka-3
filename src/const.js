@@ -108,6 +108,8 @@ module.exports.LoginMessage = {
 
 module.exports.ARTICLES_PER_PAGE = 8;
 
+module.exports.TOP_PER_PAGE = 4;
+
 module.exports.PAGER_WIDTH = 2;
 
 module.exports.API_PREFIX = `/api`;

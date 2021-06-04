@@ -7,9 +7,7 @@ const {upload} = require(`../middlewares/multer`);
 const wrapper = require(`../middlewares/wrapper`);
 const privateRoute = require(`../middlewares/private-route`);
 const {getPagerRange} = require(`../../utils`);
-const {ARTICLES_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
-
-const TOP_PER_PAGE = 4;
+const {ARTICLES_PER_PAGE, TOP_PER_PAGE, PAGER_WIDTH} = require(`../../const`);
 
 const mainRouter = new Router();
 const api = apiFactory.getAPI();

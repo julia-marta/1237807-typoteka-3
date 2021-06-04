@@ -140,6 +140,7 @@ articlesRouter.get(`/delete/:id`, privateRoute, async (req, res, next) => {
 articlesRouter.get(`/:id`, async (req, res, next) => {
   const {id} = req.params;
   const {errorMessages = null} = req.session;
+  const {referer} = req.headers;
 
   try {
     const [article, allCategories] = await Promise.all([
@@ -151,8 +152,10 @@ articlesRouter.get(`/:id`, async (req, res, next) => {
       return article.categories.some((item) => item.id === category.id);
     });
 
+    const back = referer;
+
     req.session.errorMessages = null;
-    res.render(`articles/post`, {article, categories, errorMessages});
+    res.render(`articles/post`, {article, categories, errorMessages, back});
   } catch (err) {
     next(err);
   }

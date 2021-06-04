@@ -8,7 +8,7 @@ block content
         h2.visually-hidden Основное содержание
         .post__wrapper
           .post__head
-            a.post__backwards.button.button--backwards(href=`/`) Назад
+            a.post__backwards.button.button--backwards(href=back) Назад
             +date(article.date)(class=`post__date`)
             h2.post__title.title.title--main #{article.title}
             include ../partials/themes

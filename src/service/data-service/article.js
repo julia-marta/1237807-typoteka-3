@@ -106,7 +106,7 @@ class ArticleService {
         }
       ],
       group: [`Article.id`],
-      order: [[`count`, `DESC`]],
+      order: [[Sequelize.literal(`count`), `DESC`]],
     });
 
     return articles.map((article) => article.get());

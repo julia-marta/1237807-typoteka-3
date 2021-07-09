@@ -9,7 +9,7 @@ const mainRoutes = require(`./routes/main-routes`);
 const {HttpCode} = require(`../const/server.const`);
 
 const DEFAULT_PORT = 8080;
-// const PUBLIC_DIR = `public`;
+const PUBLIC_DIR = `src/express/public`;
 const UPLOAD_DIR = `upload`;
 const TEMPLATES_DIR = `templates`;
 
@@ -22,7 +22,7 @@ app.use(expressSession({
   name: `session_id`
 }));
 
-app.use(express.static(path.resolve(__dirname + `/public`)));
+app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
 
 app.set(`views`, path.resolve(__dirname, TEMPLATES_DIR));

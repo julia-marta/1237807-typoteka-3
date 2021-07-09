@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Типотека",
   "engines": {
-    "node": "14.x"
+    "node": "14.x",
+    "npm": "6.14.10"
   },
   "main": "./src/service/service.js",
   "scripts": {

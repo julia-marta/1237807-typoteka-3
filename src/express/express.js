@@ -9,7 +9,7 @@ const mainRoutes = require(`./routes/main-routes`);
 const {HttpCode} = require(`../const/server.const`);
 
 const DEFAULT_PORT = 8080;
-const PUBLIC_DIR = `src/express/public`;
+const PUBLIC_DIR = `public`;
 const UPLOAD_DIR = `upload`;
 const TEMPLATES_DIR = `templates`;
 

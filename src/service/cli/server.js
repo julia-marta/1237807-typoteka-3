@@ -7,7 +7,7 @@ const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
 const {HttpCode, ExitCode, API_PREFIX} = require(`../../const/server.const`);
 
-const DEFAULT_PORT = process.env.PORT || 3000;
+const DEFAULT_PORT = 3000;
 
 const PortRestrict = {
   MIN: 0,

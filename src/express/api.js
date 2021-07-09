@@ -10,7 +10,6 @@ const DEFAULT_HOST = `http://localhost`;
 const port = process.env.API_PORT || DEFAULT_PORT;
 const host = process.env.HOST || DEFAULT_HOST;
 const defaultURL = `${host}:${port}${API_PREFIX}/`;
-const currentURL = `https://tipoteka.herokuapp.com${API_PREFIX}`;
 
 class API {
 
@@ -138,7 +137,7 @@ class API {
   }
 }
 
-const defaultAPI = new API(currentURL, TIMEOUT);
+const defaultAPI = new API(defaultURL, TIMEOUT);
 
 module.exports = {
   API,
